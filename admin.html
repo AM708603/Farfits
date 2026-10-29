@@ -619,10 +619,33 @@ td .actions {
 }
 .vr {
   display: grid;
-  grid-template-columns: 2fr 1.2fr 1fr 1fr auto;
+  grid-template-columns: 1.6fr 1fr 0.8fr 0.7fr auto auto;
   gap: 6px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   align-items: center;
+  padding: 8px;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--ln);
+}
+.vr-img {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 70px;
+}
+.vr-img input[type=file] {
+  font-size: 0.7rem;
+  padding: 2px;
+  width: 90px;
+}
+.v-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--ln);
 }
 .pv {
   width: 88px;
@@ -631,6 +654,43 @@ td .actions {
   border-radius: 10px;
   margin-top: 8px;
   border: 1px solid var(--ln);
+}
+.gallery-box {
+  margin-top: 4px;
+}
+.gallery-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.g-item {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+.g-item img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--ln);
+}
+.g-item .btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  padding: 0 6px;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+.gallery-hint {
+  font-size: 0.8rem;
+  color: var(--mu);
+  margin-top: 4px;
 }
 .ft {
   display: flex;
@@ -684,7 +744,8 @@ td .actions {
   .sc b { font-size: 1.4rem; }
   .bulk select, .bulk input { min-width: 0; flex: 1; }
   .vr { grid-template-columns: 1fr 1fr; }
-  .vr button { grid-column: span 2; }
+  .vr .vr-img { grid-column: span 2; flex-direction: row; }
+  .vr > .btn { grid-column: span 2; }
   th, td { padding: 10px 12px; }
 }
 
@@ -794,7 +855,7 @@ function logout() {
   location.reload();
 }
 
-// field types: t=text n=number a=textarea i=image c=category k=checkbox v=variants
+// field types: t=text n=number a=textarea i=image g=gallery c=category k=checkbox v=variants
 const CFG = {
   products: {
     title: 'Products',
@@ -805,9 +866,10 @@ const CFG = {
       ['price', 'Sale price (Rs)', 'n'],
       ['compare_price', 'Original price (Rs, 0 for none)', 'n'],
       ['label', 'Label (e.g. Best Seller)'],
-      ['image', 'Main image', 'i'],
+      ['image', 'Main image (shown on cards)', 'i'],
+      ['gallery', 'Extra product images', 'g'],
       ['description', 'Description', 'a'],
-      ['variants', 'Variants (size / colour, stock)', 'v'],
+      ['variants', 'Variants (size / colour, stock, image)', 'v'],
       ['active', 'Visible in store', 'k']
     ]
   },
@@ -992,7 +1054,12 @@ function normalizeRow(r) {
     try { variants = JSON.parse(variants || '[]'); } catch { variants = []; }
   }
   if (!Array.isArray(variants)) variants = [];
-  return { ...r, variants };
+  let gallery = r.gallery;
+  if (typeof gallery === 'string') {
+    try { gallery = JSON.parse(gallery || '[]'); } catch { gallery = []; }
+  }
+  if (!Array.isArray(gallery)) gallery = [];
+  return { ...r, variants, gallery };
 }
 
 async function list(t) {
@@ -1074,7 +1141,7 @@ async function del(t, id) {
 function openForm(t, i) {
   const c = CFG[t];
   if (!c) return alert('Unknown section: ' + t);
-  const r = i === undefined ? { active: 1, variants: [] } : normalizeRow(window._rows[i] || { active: 1, variants: [] });
+  const r = i === undefined ? { active: 1, variants: [], gallery: [] } : normalizeRow(window._rows[i] || { active: 1, variants: [], gallery: [] });
   const itemId = r.id || 0;
 
   try {
@@ -1082,12 +1149,21 @@ function openForm(t, i) {
       <h3>${i === undefined ? 'Add' : 'Edit'} ${c.title.toLowerCase().replace(/s$/, '')}</h3>
       ${c.f.map(([k, l, ty]) => {
         let v = r[k];
-        if (v === undefined || v === null) v = ty === 'v' ? [] : (ty === 'k' ? 0 : '');
+        if (v === undefined || v === null) v = (ty === 'v' || ty === 'g') ? [] : (ty === 'k' ? 0 : '');
         const fid = 'f_' + k;
         if (ty === 'a') return `<label for="${fid}">${l}</label><textarea id="${fid}" rows="3">${esc(v)}</textarea>`;
         if (ty === 'k') return `<label style="display:flex;align-items:center;gap:8px;margin-top:16px;cursor:pointer"><input type="checkbox" id="${fid}" ${v ? 'checked' : ''}> ${l}</label>`;
         if (ty === 'c') return `<label for="${fid}">${l}</label><select id="${fid}"><option value="">None</option>${(cats || []).map(x => `<option value="${esc(x.name)}" ${x.name === v ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`;
         if (ty === 'i') return `<label for="${fid}">${l}</label><input type="file" accept="image/*" onchange="img(this,'${fid}')"><input type="hidden" id="${fid}" value="${esc(v)}"><img class="pv" id="${fid}_p" src="${esc(v)}" alt="" ${v ? '' : 'hidden'}>`;
+        if (ty === 'g') {
+          const list = Array.isArray(v) ? v : [];
+          return `<label>${l}</label>
+            <div class="gallery-box" id="gallery-box">
+              <div class="gallery-list" id="gallery-list">${list.map(gThumb).join('')}</div>
+              <input type="file" accept="image/*" multiple onchange="galleryAdd(this)">
+              <p class="gallery-hint">Upload extra photos for the product page gallery</p>
+            </div>`;
+        }
         if (ty === 'v') {
           const list = Array.isArray(v) ? v : [];
           return `<label>${l}</label><div id="vs">${list.map(vr).join('')}</div><button class="btn o s" type="button" style="margin-top:6px" onclick="addVariant()">+ Add variant</button>`;
@@ -1114,14 +1190,27 @@ function addVariant() {
   if (vs) vs.insertAdjacentHTML('beforeend', vr({}));
 }
 
+const gThumb = url => `
+  <div class="g-item">
+    <img src="${esc(url)}" alt="">
+    <input type="hidden" class="g-url" value="${esc(url)}">
+    <button type="button" class="btn r s" onclick="this.closest('.g-item').remove()">×</button>
+  </div>`;
+
 const vr = v => {
   v = v || {};
+  const uid = 'vimg_' + Math.random().toString(36).slice(2, 9);
   return `
   <div class="vr">
     <input placeholder="Name e.g. 42 / Black" value="${esc(v.name || '')}">
     <input placeholder="SKU" value="${esc(v.sku || '')}">
     <input type="number" placeholder="Price (opt.)" value="${v.price || ''}" step="any">
     <input type="number" placeholder="Stock" value="${v.stock ?? ''}">
+    <div class="vr-img">
+      <input type="hidden" class="v-img-url" id="${uid}" value="${esc(v.image || '')}">
+      <img class="v-thumb" id="${uid}_p" src="${esc(v.image || '')}" alt="" ${v.image ? '' : 'hidden'}>
+      <input type="file" accept="image/*" onchange="img(this,'${uid}')" title="Variant image">
+    </div>
     <button class="btn r s" type="button" onclick="this.closest('.vr').remove()">×</button>
   </div>`;
 };
@@ -1140,6 +1229,21 @@ async function img(inp, fid) {
   }
 }
 
+async function galleryAdd(inp) {
+  const files = [...(inp.files || [])];
+  if (!files.length) return;
+  const list = $('#gallery-list');
+  for (const f of files) {
+    try {
+      const d = await call('/api/admin/upload', 'POST', null, f);
+      if (list) list.insertAdjacentHTML('beforeend', gThumb(d.url));
+    } catch (e) {
+      alert(e.message || 'Upload failed');
+    }
+  }
+  inp.value = '';
+}
+
 async function save(t, id) {
   try {
     const b = {};
@@ -1149,14 +1253,18 @@ async function save(t, id) {
         b[k] = el && el.checked ? 1 : 0;
       } else if (ty === 'v') {
         b[k] = [...document.querySelectorAll('#vs .vr')].map(row => {
-          const x = row.querySelectorAll('input');
+          const x = row.querySelectorAll('input:not([type=file]):not(.v-img-url)');
+          const imgEl = row.querySelector('.v-img-url');
           return {
             name: (x[0] && x[0].value || '').trim(),
             sku: (x[1] && x[1].value || '').trim(),
             price: +(x[2] && x[2].value) || 0,
-            stock: +(x[3] && x[3].value) || 0
+            stock: +(x[3] && x[3].value) || 0,
+            image: (imgEl && imgEl.value) || ''
           };
         }).filter(v => v.name);
+      } else if (ty === 'g') {
+        b[k] = [...document.querySelectorAll('#gallery-list .g-url')].map(el => el.value).filter(Boolean);
       } else if (ty === 'n') {
         const el = document.getElementById('f_' + k);
         b[k] = el ? (+el.value || 0) : 0;
