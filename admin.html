@@ -1006,7 +1006,7 @@ async function list(t) {
     window._rows = rows;
     window._table = t;
 
-    $('#page-actions').innerHTML = `<button class="btn" type="button" onclick="form('${t}')">+ Add new</button>`;
+    $('#page-actions').innerHTML = `<button class="btn" type="button" onclick="openForm('${t}')">+ Add new</button>`;
 
     const colLabels = {
       image: '',
@@ -1045,7 +1045,7 @@ async function list(t) {
                 }).join('')}
                 <td>
                   <div class="actions">
-                    <button class="btn o s" type="button" onclick="form('${t}',${i})">Edit</button>
+                    <button class="btn o s" type="button" onclick="openForm('${t}',${i})">Edit</button>
                     <button class="btn r s" type="button" onclick="del('${t}',${r.id})">Delete</button>
                   </div>
                 </td>
@@ -1071,7 +1071,7 @@ async function del(t, id) {
   }
 }
 
-function form(t, i) {
+function openForm(t, i) {
   const c = CFG[t];
   if (!c) return alert('Unknown section: ' + t);
   const r = i === undefined ? { active: 1, variants: [] } : normalizeRow(window._rows[i] || { active: 1, variants: [] });
