@@ -53,7 +53,7 @@ td img{width:44px;height:44px;object-fit:cover;border-radius:8px;display:block}
 
 <script>
 // 1) After deploying the Worker, paste its URL here
-const API = localStorage.api || 'https://flat-unit-fb75.amworkmanage.workers.dev/';
+const API = localStorage.api || 'https://flat-unit-fb75.amworkmanage.workers.dev';
 const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
 const fmt = n => 'Rs ' + Math.round(n || 0).toLocaleString('en-PK');
 let tok = localStorage.tok, tab = 'dash', cats = [];
