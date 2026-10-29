@@ -578,6 +578,158 @@ td .actions {
   min-width: 140px;
 }
 .bulk .spacer { flex: 1; min-width: 8px; }
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding: 10px 0;
+  font-size: 0.88rem;
+  color: var(--mu);
+}
+.pager .pages {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.pager button {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--ln);
+  background: var(--cd);
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+.pager button.on, .pager button:hover:not(:disabled) {
+  border-color: var(--li);
+  background: var(--li-soft);
+}
+.pager button:disabled { opacity: 0.4; cursor: not-allowed; }
+.search-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.search-bar input {
+  flex: 1;
+  min-width: 160px;
+}
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .no-print { display: none !important; }
+}
+.invoice {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: #0b1f3a;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px;
+  background: #fff;
+}
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid #c9a14a;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+}
+.invoice-brand {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.14em;
+  font-weight: 800;
+}
+.invoice-brand small {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  color: #5b6678;
+  font-weight: 500;
+  margin-top: 4px;
+}
+.invoice-meta { text-align: right; font-size: 0.9rem; color: #5b6678; }
+.invoice-meta b { color: #0b1f3a; font-size: 1.05rem; }
+.invoice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
+  font-size: 0.92rem;
+}
+.invoice-grid h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5b6678;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.invoice table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+.invoice th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #f4f6f9;
+  border-bottom: 2px solid #e5e9ef;
+  color: #5b6678;
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.invoice td {
+  padding: 12px;
+  border-bottom: 1px solid #eef1f5;
+}
+.invoice-totals {
+  margin-left: auto;
+  width: 260px;
+  font-size: 0.92rem;
+}
+.invoice-totals .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #eef1f5;
+}
+.invoice-totals .row.grand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-bottom: 0;
+  border-top: 2px solid #0b1f3a;
+  margin-top: 6px;
+  padding-top: 10px;
+}
+.invoice-footer {
+  margin-top: 36px;
+  padding-top: 16px;
+  border-top: 1px solid #eef1f5;
+  font-size: 0.8rem;
+  color: #5b6678;
+  text-align: center;
+}
+.invoice-page-break { page-break-after: always; }
 
 /* Header row */
 .hd {
@@ -886,13 +1038,13 @@ const CFG = {
     title: 'Banners',
     cols: ['image', 'title', 'subtitle', 'sort', 'active'],
     f: [
-      ['title', 'Headline'],
-      ['subtitle', 'Subtext'],
+      ['title', 'Headline (e.g. Month-end sale)'],
+      ['subtitle', 'Badge text (e.g. Limited time)'],
       ['button_text', 'Button text'],
-      ['link', 'Button link (e.g. Sale, Basketball)'],
-      ['image', 'Banner image', 'i'],
-      ['sort', 'Sort order', 'n'],
-      ['active', 'Visible in store', 'k']
+      ['link', 'Button link (Sale, Basketball, all, or category name)'],
+      ['image', 'Banner / sale image (upload)', 'i'],
+      ['sort', 'Sort order (lower = first)', 'n'],
+      ['active', 'Visible on homepage carousel', 'k']
     ]
   },
   delivery: {
@@ -1062,6 +1214,37 @@ function normalizeRow(r) {
   return { ...r, variants, gallery };
 }
 
+const PER_OPTS = [10, 30, 50, 100];
+
+function pagerHtml(total, page, per, onPage, onPer) {
+  const pages = Math.max(1, Math.ceil(total / per));
+  const p = Math.min(page, pages);
+  const from = total ? (p - 1) * per + 1 : 0;
+  const to = Math.min(p * per, total);
+  let btns = '';
+  const start = Math.max(1, p - 2), end = Math.min(pages, p + 2);
+  btns += `<button type="button" ${p <= 1 ? 'disabled' : ''} onclick="${onPage}(${p - 1})">‹</button>`;
+  for (let i = start; i <= end; i++) {
+    btns += `<button type="button" class="${i === p ? 'on' : ''}" onclick="${onPage}(${i})">${i}</button>`;
+  }
+  btns += `<button type="button" ${p >= pages ? 'disabled' : ''} onclick="${onPage}(${p + 1})">›</button>`;
+  return `<div class="pager">
+    <span>Showing ${from}–${to} of ${total}</span>
+    <div class="pages">${btns}</div>
+    <label style="display:flex;align-items:center;gap:6px;margin:0;color:var(--mu)">Rows
+      <select onchange="${onPer}(+this.value)" style="width:auto;padding:6px 10px">
+        ${PER_OPTS.map(n => `<option value="${n}" ${n === per ? 'selected' : ''}>${n}</option>`).join('')}
+      </select>
+    </label>
+  </div>`;
+}
+
+function filterRows(rows, q) {
+  if (!q) return rows;
+  const s = q.toLowerCase();
+  return rows.filter(r => JSON.stringify(r).toLowerCase().includes(s));
+}
+
 async function list(t) {
   const c = CFG[t];
   $('#v').innerHTML = '<div class="loading"><div class="spinner"></div> Loading…</div>';
@@ -1070,39 +1253,56 @@ async function list(t) {
     if (t === 'products' || t === 'categories') {
       cats = t === 'categories' ? rows : await call('/api/admin/categories');
     }
-    window._rows = rows;
+    window._allRows = rows;
     window._table = t;
-
+    window._listQ = window._listQ && window._listTable === t ? window._listQ : '';
+    window._listTable = t;
+    window._listPage = 1;
+    window._listPer = window._listPer || 10;
     $('#page-actions').innerHTML = `<button class="btn" type="button" onclick="openForm('${t}')">+ Add new</button>`;
+    renderListPage();
+  } catch (e) {
+    $('#v').innerHTML = `<div class="empty-state">Failed to load. ${esc(e.message || '')}</div>`;
+  }
+}
 
-    const colLabels = {
-      image: '',
-      name: 'Name',
-      category: 'Category',
-      price: 'Price',
-      compare_price: 'Compare',
-      active: 'Active',
-      sort: 'Sort',
-      title: 'Title',
-      subtitle: 'Subtitle',
-      city: 'City',
-      charge: 'Charge',
-      free_above: 'Free above',
-      account: 'Account',
-      proof: 'Proof'
-    };
+function renderListPage() {
+  const t = window._table;
+  const c = CFG[t];
+  if (!c) return;
+  const q = window._listQ || '';
+  const filtered = filterRows(window._allRows || [], q);
+  window._rows = filtered;
+  const per = window._listPer || 10;
+  const pages = Math.max(1, Math.ceil(filtered.length / per));
+  if (window._listPage > pages) window._listPage = pages;
+  const page = window._listPage || 1;
+  const slice = filtered.slice((page - 1) * per, page * per);
 
-    $('#v').innerHTML = `
-      <div class="tw">
-        <table>
-          <thead>
-            <tr>
-              ${c.cols.map(k => `<th>${colLabels[k] || k.replace('_', ' ')}</th>`).join('')}
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map((r, i) => `
+  const colLabels = {
+    image: '', name: 'Name', category: 'Category', price: 'Price', compare_price: 'Compare',
+    active: 'Active', sort: 'Sort', title: 'Title', subtitle: 'Subtitle', city: 'City',
+    charge: 'Charge', free_above: 'Free above', account: 'Account', proof: 'Proof'
+  };
+
+  $('#v').innerHTML = `
+    <div class="search-bar">
+      <input id="lq" placeholder="Search ${c.title.toLowerCase()}…" value="${esc(q)}" onkeydown="if(event.key==='Enter')runListSearch()">
+      <button class="btn" type="button" onclick="runListSearch()">Search</button>
+      ${q ? `<button class="btn o" type="button" onclick="window._listQ='';window._listPage=1;renderListPage()">Clear</button>` : ''}
+    </div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            ${c.cols.map(k => `<th>${colLabels[k] || k.replace('_', ' ')}</th>`).join('')}
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${slice.map((r) => {
+            const idx = filtered.indexOf(r);
+            return `
               <tr>
                 ${c.cols.map(k => {
                   if (k === 'image') return `<td>${r[k] ? `<img src="${esc(r[k])}" alt="">` : '—'}</td>`;
@@ -1112,19 +1312,32 @@ async function list(t) {
                 }).join('')}
                 <td>
                   <div class="actions">
-                    <button class="btn o s" type="button" onclick="openForm('${t}',${i})">Edit</button>
+                    <button class="btn o s" type="button" onclick="openForm('${t}',${idx})">Edit</button>
                     <button class="btn r s" type="button" onclick="del('${t}',${r.id})">Delete</button>
                   </div>
                 </td>
-              </tr>
-            `).join('') || `<tr><td colspan="${c.cols.length + 1}" style="text-align:center;padding:2.5rem;color:var(--mu)">Nothing here yet. Click <b>+ Add new</b> to create the first one.</td></tr>`}
-          </tbody>
-        </table>
-      </div>
-    `;
-  } catch (e) {
-    $('#v').innerHTML = `<div class="empty-state">Failed to load. ${esc(e.message || '')}</div>`;
-  }
+              </tr>`;
+          }).join('') || `<tr><td colspan="${c.cols.length + 1}" style="text-align:center;padding:2.5rem;color:var(--mu)">${q ? 'No matches found.' : 'Nothing here yet. Click <b>+ Add new</b> to create the first one.'}</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    ${pagerHtml(filtered.length, page, per, 'gotoListPage', 'setListPer')}
+  `;
+}
+
+function runListSearch() {
+  window._listQ = ($('#lq') && $('#lq').value || '').trim();
+  window._listPage = 1;
+  renderListPage();
+}
+function gotoListPage(p) {
+  window._listPage = Math.max(1, p);
+  renderListPage();
+}
+function setListPer(n) {
+  window._listPer = n;
+  window._listPage = 1;
+  renderListPage();
 }
 
 async function del(t, id) {
@@ -1292,27 +1505,56 @@ async function save(t, id) {
 const STAT = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'returned'];
 
 async function orders() {
-  $('#page-actions').innerHTML = `<button class="btn o" onclick="csv()">Export CSV</button>`;
+  window._oPage = 1;
+  window._oPer = window._oPer || 10;
+  window._oQ = '';
+  $('#page-actions').innerHTML = `
+    <button class="btn o" type="button" onclick="printSelected()">Print selected</button>
+    <button class="btn o" type="button" onclick="csv()">Export CSV</button>`;
   $('#v').innerHTML = `
     <div class="bulk">
-      <input id="oq" placeholder="Search order no, name, phone…" oninput="clearTimeout(window._t);window._t=setTimeout(loadO,300)" style="flex:1;min-width:160px">
-      <select id="os" onchange="loadO()">
+      <input id="oq" placeholder="Search order no, name, phone…" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')runOrderSearch()">
+      <button class="btn" type="button" onclick="runOrderSearch()">Search</button>
+      <select id="os" onchange="runOrderSearch()">
         <option value="">All statuses</option>
         ${STAT.map(s => `<option>${s}</option>`).join('')}
       </select>
       <span class="spacer"></span>
       <span style="font-size:0.85rem;color:var(--mu);white-space:nowrap">With selected:</span>
       <select id="bs">${STAT.map(s => `<option>${s}</option>`).join('')}</select>
-      <button class="btn s" onclick="bulk('status')">Set status</button>
-      <button class="btn s" onclick="bulk('courier')">Book courier</button>
+      <button class="btn s" type="button" onclick="bulk('status')">Set status</button>
+      <button class="btn s" type="button" onclick="bulk('courier')">Book courier</button>
+      <button class="btn s" type="button" onclick="printSelected()">Print</button>
     </div>
     <div class="tw"><table id="ot"></table></div>
+    <div id="opager"></div>
   `;
-  loadO();
+  await fetchOrders();
 }
 
-async function loadO() {
-  const rows = window._o = await call(`/api/admin/orders?status=${$('#os').value}&q=${encodeURIComponent($('#oq').value)}`);
+async function runOrderSearch() {
+  window._oQ = ($('#oq') && $('#oq').value || '').trim();
+  window._oPage = 1;
+  await fetchOrders();
+}
+
+async function fetchOrders() {
+  const q = window._oQ || '';
+  const status = $('#os') ? $('#os').value : '';
+  const rows = await call(`/api/admin/orders?status=${status}&q=${encodeURIComponent(q)}`);
+  window._oAll = rows;
+  renderOrdersPage();
+}
+
+function renderOrdersPage() {
+  const rows = window._oAll || [];
+  const per = window._oPer || 10;
+  const pages = Math.max(1, Math.ceil(rows.length / per));
+  if (window._oPage > pages) window._oPage = pages;
+  const page = window._oPage || 1;
+  const slice = rows.slice((page - 1) * per, page * per);
+  window._o = slice;
+
   $('#ot').innerHTML = `
     <thead>
       <tr>
@@ -1328,9 +1570,9 @@ async function loadO() {
       </tr>
     </thead>
     <tbody>
-      ${rows.map((o, i) => `
+      ${slice.map((o, i) => `
         <tr>
-          <td><input class="oc" type="checkbox" style="width:auto" value="${o.id}"></td>
+          <td><input class="oc" type="checkbox" style="width:auto" value="${o.id}" data-idx="${i}"></td>
           <td><b>${esc(o.order_no)}</b></td>
           <td>${esc(o.name)}<br><small style="color:var(--mu)">${esc(o.phone)}</small></td>
           <td>${esc(o.city)}</td>
@@ -1340,12 +1582,28 @@ async function loadO() {
             <span class="pill ${esc(o.status)}">${esc(o.status)}</span>
             ${o.tracking ? `<br><small style="color:var(--mu)">${esc(o.courier)} ${esc(o.tracking)}</small>` : ''}
           </td>
-          <td>${o.created_at.slice(0, 10)}</td>
-          <td><button class="btn o s" onclick="ov(${i})">View</button></td>
+          <td>${(o.created_at || '').slice(0, 10)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn o s" type="button" onclick="ov(${i})">View</button>
+              <button class="btn o s" type="button" onclick="printOrders([window._o[${i}]])">Print</button>
+            </div>
+          </td>
         </tr>
       `).join('') || '<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--mu)">No orders found.</td></tr>'}
     </tbody>
   `;
+  if ($('#opager')) $('#opager').innerHTML = pagerHtml(rows.length, page, per, 'gotoOrderPage', 'setOrderPer');
+}
+
+function gotoOrderPage(p) {
+  window._oPage = Math.max(1, p);
+  renderOrdersPage();
+}
+function setOrderPer(n) {
+  window._oPer = n;
+  window._oPage = 1;
+  renderOrdersPage();
 }
 
 async function bulk(action) {
@@ -1355,12 +1613,92 @@ async function bulk(action) {
   const r = await call('/api/admin/orders/bulk', 'POST', { ids, action, status: $('#bs').value });
   const bad = r.filter(x => x.error);
   if (bad.length) alert(`${r.length - bad.length} done, ${bad.length} failed:\n` + bad.map(x => '#' + x.id + ': ' + x.error).join('\n'));
-  loadO();
+  await fetchOrders();
+}
+
+function printSelected() {
+  const ids = new Set([...document.querySelectorAll('.oc:checked')].map(c => +c.value));
+  if (!ids.size) return alert('Select at least one order to print.');
+  const list = (window._oAll || []).filter(o => ids.has(o.id));
+  printOrders(list);
+}
+
+function invoiceHtml(o) {
+  let it = [];
+  try { it = JSON.parse(o.items || '[]'); } catch { it = []; }
+  const date = (o.created_at || '').slice(0, 16).replace('T', ' ');
+  return `
+  <div class="invoice invoice-page-break">
+    <div class="invoice-header">
+      <div class="invoice-brand">FARFITS<small>Premium Footwear · Karachi</small></div>
+      <div class="invoice-meta">
+        <div><b>INVOICE</b></div>
+        <div>Order <b>${esc(o.order_no)}</b></div>
+        <div>${esc(date)}</div>
+        <div style="margin-top:6px;text-transform:capitalize">Status: <b>${esc(o.status)}</b></div>
+      </div>
+    </div>
+    <div class="invoice-grid">
+      <div>
+        <h4>Bill to</h4>
+        <div><b>${esc(o.name)}</b></div>
+        <div>${esc(o.phone)}</div>
+        ${o.email ? `<div>${esc(o.email)}</div>` : ''}
+        <div>${esc(o.address)}</div>
+        <div>${esc(o.city)}</div>
+      </div>
+      <div>
+        <h4>Payment & shipping</h4>
+        <div>Payment: <b>${esc(o.payment)}</b></div>
+        ${o.tid ? `<div>Txn ID: ${esc(o.tid)}</div>` : ''}
+        ${o.courier ? `<div>Courier: ${esc(o.courier)}</div>` : ''}
+        ${o.tracking ? `<div>Tracking: ${esc(o.tracking)}</div>` : ''}
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Variant</th><th>Qty</th><th>Price</th><th>Amount</th></tr>
+      </thead>
+      <tbody>
+        ${it.map(x => `
+          <tr>
+            <td>${esc(x.name)}</td>
+            <td>${esc(x.v || '—')}</td>
+            <td>${x.qty}</td>
+            <td>${fmt(x.price)}</td>
+            <td>${fmt(x.price * x.qty)}</td>
+          </tr>`).join('') || '<tr><td colspan="5">No items</td></tr>'}
+      </tbody>
+    </table>
+    <div class="invoice-totals">
+      <div class="row"><span>Subtotal</span><span>${fmt(o.subtotal)}</span></div>
+      <div class="row"><span>Shipping</span><span>${fmt(o.shipping)}</span></div>
+      <div class="row grand"><span>Total</span><span>${fmt(o.total)}</span></div>
+    </div>
+    <div class="invoice-footer">
+      FARFITS · Block H North Nazimabad Town, Karachi · +92 334 2907793<br>
+      Thank you for shopping with us.
+    </div>
+  </div>`;
+}
+
+function printOrders(list) {
+  if (!list || !list.length) return;
+  let area = document.getElementById('print-area');
+  if (!area) {
+    area = document.createElement('div');
+    area.id = 'print-area';
+    document.body.appendChild(area);
+  }
+  area.innerHTML = list.map(invoiceHtml).join('');
+  window.print();
 }
 
 function ov(i) {
   const o = window._o[i];
-  const it = JSON.parse(o.items || '[]');
+  if (!o) return;
+  let it = [];
+  try { it = JSON.parse(o.items || '[]'); } catch { it = []; }
   $('#mb').innerHTML = `
     <h3>${esc(o.order_no)}</h3>
     <p style="margin-top:6px">${esc(o.name)} · <a href="tel:${esc(o.phone)}" style="color:var(--li)">${esc(o.phone)}</a>${o.email ? ' · ' + esc(o.email) : ''}</p>
@@ -1379,9 +1717,9 @@ function ov(i) {
     <label for="o_t">Tracking number</label>
     <input id="o_t" value="${esc(o.tracking)}">
     <div class="ft">
-      <button class="btn o" onclick="window.print()">Print</button>
-      <button class="btn o" onclick="$('#md').classList.remove('on')">Close</button>
-      <button class="btn" onclick="so(${o.id})">Save</button>
+      <button class="btn o" type="button" onclick="printOrders([window._o[${i}]])">Print invoice</button>
+      <button class="btn o" type="button" onclick="closeModal()">Close</button>
+      <button class="btn" type="button" onclick="so(${o.id})">Save</button>
     </div>
   `;
   $('#md').classList.add('on');
@@ -1393,14 +1731,15 @@ async function so(id) {
     courier: $('#o_c').value,
     tracking: $('#o_t').value
   });
-  $('#md').classList.remove('on');
-  loadO();
+  closeModal();
+  await fetchOrders();
 }
 
 function csv() {
+  const rows = window._oAll || window._o || [];
   const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
   const h = ['order_no', 'name', 'phone', 'city', 'address', 'total', 'payment', 'status', 'created_at'];
-  const b = new Blob([[h.join(','), ...window._o.map(o => h.map(k => q(o[k])).join(','))].join('\n')], { type: 'text/csv' });
+  const b = new Blob([[h.join(','), ...rows.map(o => h.map(k => q(o[k])).join(','))].join('\n')], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(b);
   a.download = 'orders.csv';
