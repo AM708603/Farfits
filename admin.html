@@ -7,7 +7,6 @@
 <meta name="theme-color" content="#0b1f3a">
 <title>FARFITS Admin</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1f3a'/%3E%3Crect x='15' y='14' width='34' height='5' rx='2.5' fill='%23fff'/%3E%3Crect x='29' y='19' width='6' height='26' fill='%23fff'/%3E%3Crect x='19' y='30' width='26' height='3.5' fill='%23c9a14a'/%3E%3Crect x='24' y='45' width='16' height='3' fill='%23fff'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -35,6 +34,9 @@
   --radius-sm: 8px;
   --radius-lg: 16px;
   --sidebar-w: 240px;
+  --sidebar-bg: #0b1f3a;
+  --sidebar-text: rgba(255, 255, 255, 0.62);
+  --sidebar-text-active: #ffffff;
   --transition: 0.18s ease;
 }
 
@@ -56,6 +58,7 @@
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.35);
+    --sidebar-bg: #0a1528;
   }
 }
 
@@ -203,27 +206,28 @@ label:first-child { margin-top: 0; }
   min-height: 100dvh;
 }
 
-/* Sidebar */
+/* Sidebar — always dark for consistent contrast */
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   width: var(--sidebar-w);
   height: 100dvh;
-  background: var(--ink);
+  background: var(--sidebar-bg);
   color: #fff;
   display: flex;
   flex-direction: column;
   z-index: 40;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
 }
 .sidebar-brand {
   padding: 1.35rem 1.25rem 1.1rem;
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 .sidebar-brand .logo {
   width: 32px;
@@ -251,6 +255,7 @@ label:first-child { margin-top: 0; }
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-height: 0;
 }
 .sidebar-nav button {
   display: flex;
@@ -260,7 +265,7 @@ label:first-child { margin-top: 0; }
   text-align: left;
   background: none;
   border: 0;
-  color: rgba(255, 255, 255, 0.62);
+  color: var(--sidebar-text);
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -269,23 +274,24 @@ label:first-child { margin-top: 0; }
   transition: background var(--transition), color var(--transition);
 }
 .sidebar-nav button:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-text-active);
 }
 .sidebar-nav button.on {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--sidebar-text-active);
   box-shadow: inset 3px 0 0 var(--li);
 }
 .sidebar-nav button .icon {
   width: 18px;
   height: 18px;
-  opacity: 0.85;
+  opacity: 0.9;
   flex-shrink: 0;
 }
 .sidebar-footer {
-  padding: 0.75rem 0.7rem 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.75rem 0.7rem 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 .sidebar-footer button {
   display: flex;
@@ -295,16 +301,22 @@ label:first-child { margin-top: 0; }
   text-align: left;
   background: none;
   border: 0;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.55);
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 0.9rem;
+  font-weight: 500;
   transition: background var(--transition), color var(--transition);
 }
 .sidebar-footer button:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
+}
+.sidebar-footer button .icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 /* Overlay for mobile sidebar */
