@@ -6,7 +6,6 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0b1f3a">
 <title>FARFITS Admin</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1f3a'/%3E%3Crect x='15' y='14' width='34' height='5' rx='2.5' fill='%23fff'/%3E%3Crect x='29' y='19' width='6' height='26' fill='%23fff'/%3E%3Crect x='19' y='30' width='26' height='3.5' fill='%23c9a14a'/%3E%3Crect x='24' y='45' width='16' height='3' fill='%23fff'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -750,17 +749,25 @@ const fmt = n => 'Rs ' + Math.round(n || 0).toLocaleString('en-PK');
 let tok = localStorage.tok, tab = 'dash', cats = [];
 
 async function call(path, method = 'GET', body, raw) {
+  const headers = { Authorization: 'Bearer ' + tok };
+  if (raw) headers['content-type'] = raw.type || 'application/octet-stream';
+  else if (body !== undefined && body !== null && method !== 'GET' && method !== 'DELETE') {
+    headers['content-type'] = 'application/json';
+  }
   const r = await fetch(API + path, {
     method,
-    headers: {
-      Authorization: 'Bearer ' + tok,
-      ...(raw ? { 'content-type': raw.type } : { 'content-type': 'application/json' })
-    },
-    body: raw || (body && JSON.stringify(body))
+    headers,
+    body: raw || (body !== undefined && body !== null && method !== 'GET' && method !== 'DELETE' ? JSON.stringify(body) : undefined)
   });
   if (r.status === 401) { logout(); throw new Error('Session expired'); }
-  const d = await r.json();
-  if (!r.ok) { alert(d.error || 'Something went wrong'); throw new Error(d.error); }
+  const text = await r.text();
+  let d = {};
+  try { d = text ? JSON.parse(text) : {}; } catch { d = { error: text || 'Invalid response' }; }
+  if (!r.ok) {
+    const msg = d.error || ('Request failed (' + r.status + ')');
+    alert(msg);
+    throw new Error(msg);
+  }
   return d;
 }
 
@@ -978,135 +985,199 @@ async function dash() {
 }
 
 /* ---------- generic list + form ---------- */
+function normalizeRow(r) {
+  if (!r) return r;
+  let variants = r.variants;
+  if (typeof variants === 'string') {
+    try { variants = JSON.parse(variants || '[]'); } catch { variants = []; }
+  }
+  if (!Array.isArray(variants)) variants = [];
+  return { ...r, variants };
+}
+
 async function list(t) {
   const c = CFG[t];
   $('#v').innerHTML = '<div class="loading"><div class="spinner"></div> Loading…</div>';
-  const rows = await call('/api/admin/' + t);
-  if (t === 'products' || t === 'categories') {
-    cats = t === 'categories' ? rows : await call('/api/admin/categories');
-  }
-  window._rows = rows;
+  try {
+    const rows = (await call('/api/admin/' + t)).map(normalizeRow);
+    if (t === 'products' || t === 'categories') {
+      cats = t === 'categories' ? rows : await call('/api/admin/categories');
+    }
+    window._rows = rows;
+    window._table = t;
 
-  $('#page-actions').innerHTML = `<button class="btn" onclick="form('${t}')">+ Add new</button>`;
+    $('#page-actions').innerHTML = `<button class="btn" type="button" onclick="form('${t}')">+ Add new</button>`;
 
-  const colLabels = {
-    image: '',
-    name: 'Name',
-    category: 'Category',
-    price: 'Price',
-    compare_price: 'Compare',
-    active: 'Active',
-    sort: 'Sort',
-    title: 'Title',
-    subtitle: 'Subtitle',
-    city: 'City',
-    charge: 'Charge',
-    free_above: 'Free above',
-    account: 'Account',
-    proof: 'Proof'
-  };
+    const colLabels = {
+      image: '',
+      name: 'Name',
+      category: 'Category',
+      price: 'Price',
+      compare_price: 'Compare',
+      active: 'Active',
+      sort: 'Sort',
+      title: 'Title',
+      subtitle: 'Subtitle',
+      city: 'City',
+      charge: 'Charge',
+      free_above: 'Free above',
+      account: 'Account',
+      proof: 'Proof'
+    };
 
-  $('#v').innerHTML = `
-    <div class="tw">
-      <table>
-        <thead>
-          <tr>
-            ${c.cols.map(k => `<th>${colLabels[k] || k.replace('_', ' ')}</th>`).join('')}
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map((r, i) => `
+    $('#v').innerHTML = `
+      <div class="tw">
+        <table>
+          <thead>
             <tr>
-              ${c.cols.map(k => {
-                if (k === 'image') return `<td>${r[k] ? `<img src="${esc(r[k])}" alt="">` : '—'}</td>`;
-                if (['active', 'proof'].includes(k)) return `<td>${r[k] ? '<span style="color:var(--gn);font-weight:600">Yes</span>' : '<span style="color:var(--mu)">No</span>'}</td>`;
-                if (['price', 'compare_price', 'charge', 'free_above'].includes(k)) return `<td>${fmt(r[k])}</td>`;
-                return `<td>${esc(r[k]) || '—'}</td>`;
-              }).join('')}
-              <td>
-                <div class="actions">
-                  <button class="btn o s" onclick="form('${t}',${i})">Edit</button>
-                  <button class="btn r s" onclick="del('${t}',${r.id})">Delete</button>
-                </div>
-              </td>
+              ${c.cols.map(k => `<th>${colLabels[k] || k.replace('_', ' ')}</th>`).join('')}
+              <th></th>
             </tr>
-          `).join('') || `<tr><td colspan="${c.cols.length + 1}" style="text-align:center;padding:2.5rem;color:var(--mu)">Nothing here yet. Click <b>+ Add new</b> to create the first one.</td></tr>`}
-        </tbody>
-      </table>
-    </div>
-  `;
+          </thead>
+          <tbody>
+            ${rows.map((r, i) => `
+              <tr>
+                ${c.cols.map(k => {
+                  if (k === 'image') return `<td>${r[k] ? `<img src="${esc(r[k])}" alt="">` : '—'}</td>`;
+                  if (['active', 'proof'].includes(k)) return `<td>${r[k] ? '<span style="color:var(--gn);font-weight:600">Yes</span>' : '<span style="color:var(--mu)">No</span>'}</td>`;
+                  if (['price', 'compare_price', 'charge', 'free_above'].includes(k)) return `<td>${fmt(r[k])}</td>`;
+                  return `<td>${esc(r[k]) || '—'}</td>`;
+                }).join('')}
+                <td>
+                  <div class="actions">
+                    <button class="btn o s" type="button" onclick="form('${t}',${i})">Edit</button>
+                    <button class="btn r s" type="button" onclick="del('${t}',${r.id})">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('') || `<tr><td colspan="${c.cols.length + 1}" style="text-align:center;padding:2.5rem;color:var(--mu)">Nothing here yet. Click <b>+ Add new</b> to create the first one.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } catch (e) {
+    $('#v').innerHTML = `<div class="empty-state">Failed to load. ${esc(e.message || '')}</div>`;
+  }
 }
 
 async function del(t, id) {
-  if (confirm('Delete this item? This cannot be undone.')) {
+  if (!id) return alert('Missing item id.');
+  if (!confirm('Delete this item? This cannot be undone.')) return;
+  try {
     await call(`/api/admin/${t}/${id}`, 'DELETE');
     list(t);
+  } catch (e) {
+    alert(e.message || 'Delete failed');
   }
 }
 
 function form(t, i) {
   const c = CFG[t];
-  const r = i === undefined ? { active: 1 } : window._rows[i];
-  $('#mb').innerHTML = `
-    <h3>${i === undefined ? 'Add' : 'Edit'} ${c.title.toLowerCase().replace(/s$/, '')}</h3>
-    ${c.f.map(([k, l, ty]) => {
-      const v = r[k] ?? '';
-      const id = 'f_' + k;
-      if (ty === 'a') return `<label for="${id}">${l}</label><textarea id="${id}" rows="3">${esc(v)}</textarea>`;
-      if (ty === 'k') return `<label style="display:flex;align-items:center;gap:8px;margin-top:16px;cursor:pointer"><input type="checkbox" id="${id}" ${v ? 'checked' : ''}> ${l}</label>`;
-      if (ty === 'c') return `<label for="${id}">${l}</label><select id="${id}"><option value="">None</option>${cats.map(x => `<option ${x.name === v ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`;
-      if (ty === 'i') return `<label for="${id}">${l}</label><input type="file" accept="image/*" onchange="img(this,'${id}')"><input type="hidden" id="${id}" value="${esc(v)}"><img class="pv" id="${id}_p" src="${esc(v)}" alt="" ${v ? '' : 'hidden'}>`;
-      if (ty === 'v') return `<label>${l}</label><div id="vs">${(v || []).map(vr).join('')}</div><button class="btn o s" type="button" style="margin-top:6px" onclick="$('#vs').insertAdjacentHTML('beforeend',vr({}))">+ Add variant</button>`;
-      return `<label for="${id}">${l}</label><input id="${id}" type="${ty === 'n' ? 'number' : 'text'}" value="${esc(v)}">`;
-    }).join('')}
-    <div class="ft">
-      <button class="btn o" onclick="$('#md').classList.remove('on')">Cancel</button>
-      <button class="btn" onclick="save('${t}',${r.id || 0})">Save</button>
-    </div>
-  `;
-  $('#md').classList.add('on');
+  if (!c) return alert('Unknown section: ' + t);
+  const r = i === undefined ? { active: 1, variants: [] } : normalizeRow(window._rows[i] || { active: 1, variants: [] });
+  const itemId = r.id || 0;
+
+  try {
+    $('#mb').innerHTML = `
+      <h3>${i === undefined ? 'Add' : 'Edit'} ${c.title.toLowerCase().replace(/s$/, '')}</h3>
+      ${c.f.map(([k, l, ty]) => {
+        let v = r[k];
+        if (v === undefined || v === null) v = ty === 'v' ? [] : (ty === 'k' ? 0 : '');
+        const fid = 'f_' + k;
+        if (ty === 'a') return `<label for="${fid}">${l}</label><textarea id="${fid}" rows="3">${esc(v)}</textarea>`;
+        if (ty === 'k') return `<label style="display:flex;align-items:center;gap:8px;margin-top:16px;cursor:pointer"><input type="checkbox" id="${fid}" ${v ? 'checked' : ''}> ${l}</label>`;
+        if (ty === 'c') return `<label for="${fid}">${l}</label><select id="${fid}"><option value="">None</option>${(cats || []).map(x => `<option value="${esc(x.name)}" ${x.name === v ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`;
+        if (ty === 'i') return `<label for="${fid}">${l}</label><input type="file" accept="image/*" onchange="img(this,'${fid}')"><input type="hidden" id="${fid}" value="${esc(v)}"><img class="pv" id="${fid}_p" src="${esc(v)}" alt="" ${v ? '' : 'hidden'}>`;
+        if (ty === 'v') {
+          const list = Array.isArray(v) ? v : [];
+          return `<label>${l}</label><div id="vs">${list.map(vr).join('')}</div><button class="btn o s" type="button" style="margin-top:6px" onclick="addVariant()">+ Add variant</button>`;
+        }
+        return `<label for="${fid}">${l}</label><input id="${fid}" type="${ty === 'n' ? 'number' : 'text'}" value="${esc(v)}" ${ty === 'n' ? 'step="any"' : ''}>`;
+      }).join('')}
+      <div class="ft">
+        <button class="btn o" type="button" onclick="closeModal()">Cancel</button>
+        <button class="btn" type="button" onclick="save('${t}',${itemId})">Save</button>
+      </div>
+    `;
+    $('#md').classList.add('on');
+  } catch (e) {
+    alert('Could not open form: ' + (e.message || e));
+  }
 }
 
-const vr = v => `
-  <div class="vr">
-    <input placeholder="Name e.g. 42 / Black" value="${esc(v.name)}">
-    <input placeholder="SKU" value="${esc(v.sku)}">
-    <input type="number" placeholder="Price (opt.)" value="${v.price || ''}">
-    <input type="number" placeholder="Stock" value="${v.stock ?? ''}">
-    <button class="btn r s" type="button" onclick="this.parentNode.remove()">×</button>
-  </div>
-`;
+function closeModal() {
+  $('#md').classList.remove('on');
+}
 
-async function img(inp, id) {
+function addVariant() {
+  const vs = $('#vs');
+  if (vs) vs.insertAdjacentHTML('beforeend', vr({}));
+}
+
+const vr = v => {
+  v = v || {};
+  return `
+  <div class="vr">
+    <input placeholder="Name e.g. 42 / Black" value="${esc(v.name || '')}">
+    <input placeholder="SKU" value="${esc(v.sku || '')}">
+    <input type="number" placeholder="Price (opt.)" value="${v.price || ''}" step="any">
+    <input type="number" placeholder="Stock" value="${v.stock ?? ''}">
+    <button class="btn r s" type="button" onclick="this.closest('.vr').remove()">×</button>
+  </div>`;
+};
+
+async function img(inp, fid) {
   const f = inp.files[0];
   if (!f) return;
-  const d = await call('/api/admin/upload', 'POST', null, Object.assign(f, {}) && new Blob([f], { type: f.type }));
-  $('#' + id).value = d.url;
-  const p = $('#' + id + '_p');
-  p.src = d.url;
-  p.hidden = false;
+  try {
+    const d = await call('/api/admin/upload', 'POST', null, f);
+    const hidden = document.getElementById(fid);
+    if (hidden) hidden.value = d.url;
+    const p = document.getElementById(fid + '_p');
+    if (p) { p.src = d.url; p.hidden = false; }
+  } catch (e) {
+    alert(e.message || 'Upload failed');
+  }
 }
 
 async function save(t, id) {
-  const b = {};
-  CFG[t].f.forEach(([k, , ty]) => {
-    const e = $('#f_' + k) || $('#vs');
-    b[k] = ty === 'k'
-      ? +$('#f_' + k).checked
-      : ty === 'v'
-        ? [...document.querySelectorAll('#vs .vr')].map(r => {
-            const x = r.querySelectorAll('input');
-            return { name: x[0].value.trim(), sku: x[1].value.trim(), price: +x[2].value || 0, stock: +x[3].value || 0 };
-          }).filter(v => v.name)
-        : ty === 'n'
-          ? +e.value || 0
-          : e.value;
-  });
-  if (!(b.name || b.title || b.city)) return alert('Please fill in the name.');
-  await call(`/api/admin/${t}${id ? '/' + id : ''}`, id ? 'PUT' : 'POST', b);
-  $('#md').classList.remove('on');
-  list(t);
+  try {
+    const b = {};
+    CFG[t].f.forEach(([k, , ty]) => {
+      if (ty === 'k') {
+        const el = document.getElementById('f_' + k);
+        b[k] = el && el.checked ? 1 : 0;
+      } else if (ty === 'v') {
+        b[k] = [...document.querySelectorAll('#vs .vr')].map(row => {
+          const x = row.querySelectorAll('input');
+          return {
+            name: (x[0] && x[0].value || '').trim(),
+            sku: (x[1] && x[1].value || '').trim(),
+            price: +(x[2] && x[2].value) || 0,
+            stock: +(x[3] && x[3].value) || 0
+          };
+        }).filter(v => v.name);
+      } else if (ty === 'n') {
+        const el = document.getElementById('f_' + k);
+        b[k] = el ? (+el.value || 0) : 0;
+      } else {
+        const el = document.getElementById('f_' + k);
+        b[k] = el ? el.value : '';
+      }
+    });
+
+    if (!(b.name || b.title || b.city)) {
+      return alert('Please fill in the required name / title / city field.');
+    }
+
+    const path = id ? `/api/admin/${t}/${id}` : `/api/admin/${t}`;
+    const method = id ? 'PUT' : 'POST';
+    await call(path, method, b);
+    closeModal();
+    list(t);
+  } catch (e) {
+    alert(e.message || 'Save failed');
+  }
 }
 
 /* ---------- orders ---------- */
