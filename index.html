@@ -180,7 +180,16 @@ footer h4{font-family:var(--hf);color:var(--li);margin-bottom:1rem}footer li,foo
 <div class="trust"><div><b>Free delivery</b><small>On orders above Rs 15,000</small></div><div><b>Cash on delivery</b><small>Pay when you receive</small></div><div><b>7-day returns</b><small>Easy and hassle free</small></div><div><b>24/7 support</b><small>Call or message us</small></div></div>
 <section class="wrap"><div class="st rv"><h2>Shop by category</h2></div><div class="cats" id="cats"></div></section>
 <section class="wrap" style="padding-top:0"><div class="st rv"><h2>All products</h2><a class="btn o" onclick="shop('all')">View all</a></div><div class="grid" id="hp"></div></section>
-<section class="promo" id="promo-section" style="display:none"><div class="t"><small style="background:var(--li);color:var(--ink);padding:4px 14px;border-radius:99px;font-weight:700">Limited time</small><h2 class="rv">Month-end sale is live</h2><p>Save on selected styles before the clock runs out.</p><div class="cd" id="cd"></div><a class="btn l" onclick="shop('Sale')">Shop the sale</a></div><div class="ph" id="promo-img"></div></section>
+<section class="promo" id="promo-section" style="display:none">
+  <div class="t">
+    <small id="promo-badge" style="background:var(--li);color:var(--ink);padding:4px 14px;border-radius:99px;font-weight:700">Limited time</small>
+    <h2 class="rv" id="promo-title">Month-end sale is live</h2>
+    <p id="promo-sub">Save on selected styles before the clock runs out.</p>
+    <div class="cd" id="cd"></div>
+    <a class="btn l" id="promo-btn" onclick="shop('Sale')">Shop the sale</a>
+  </div>
+  <div class="ph" id="promo-img"></div>
+</section>
 <section class="wrap"><div class="st rv"><h2>Explore collections</h2></div><div class="col" id="col"></div></section>
 <section class="wrap" style="padding-top:0"><div class="st rv"><h2>Customer reviews</h2><p>What our customers say.</p></div><div class="rg" id="rg"></div></section>
 <section class="wrap" style="padding-top:0"><div class="cg"><div class="rv"><div class="st" style="margin-bottom:1rem"><h2>Contact us</h2></div>
@@ -852,7 +861,12 @@ function prev(i) {
 let cs = 0, tm;
 function renderBanners() {
   const car = $('car');
-  if (!banners.length) {
+  // Exclude promo/sale banners from top carousel (they power the month-end sale block)
+  const slides = banners.filter(b => {
+    const l = (b.link || '').toLowerCase().trim();
+    return l !== 'promo';
+  });
+  if (!slides.length) {
     car.innerHTML = `
       <div class="sl s1 on">
         <div class="bgi" style="background-image:url(https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1920&q=80)"></div>
@@ -862,7 +876,7 @@ function renderBanners() {
       <div class="dots" id="dots"></div>`;
     return;
   }
-  car.innerHTML = banners.map((b, i) => `
+  car.innerHTML = slides.map((b, i) => `
     <div class="sl ${i === 0 ? 'on' : ''}">
       <div class="bgi" style="background-image:url('${esc(b.image || '')}')"></div>
       <div class="ov"></div>
@@ -878,7 +892,7 @@ function renderBanners() {
     <div class="dots" id="dots"></div>`;
 
   const dots = $('dots');
-  banners.forEach((_, i) => {
+  slides.forEach((_, i) => {
     const d = document.createElement('button');
     d.className = 'dot' + (i ? '' : ' on');
     d.setAttribute('aria-label', 'Slide ' + (i + 1));
@@ -1015,13 +1029,37 @@ function renderHome() {
     </button>`;
   }).join('') || '<p style="color:var(--mu)">Collections will appear once categories are added.</p>';
 
-  // promo section if any sale products
+  // Month-end / promo block — controlled from Admin → Banners
+  // Create/edit a banner and set Button link to "promo" (or "Sale") to manage this section
+  const promoBanner = banners.find(b => {
+    const l = (b.link || '').toLowerCase().trim();
+    return l === 'promo' || l === 'sale';
+  });
   const saleItems = products.filter(p => +p.compare_price > +p.price);
-  if (saleItems.length) {
+  if (promoBanner || saleItems.length) {
     $('promo-section').style.display = 'grid';
-    $('promo-img').innerHTML = `<img src="${esc(saleItems[0].image || '')}" alt="Sale" onerror="this.src='https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1200&q=80'">`;
+    if (promoBanner) {
+      if ($('promo-badge')) {
+        const badge = promoBanner.subtitle || 'Limited time';
+        $('promo-badge').textContent = badge;
+        $('promo-badge').style.display = badge ? '' : 'none';
+      }
+      if ($('promo-title')) $('promo-title').textContent = promoBanner.title || 'Month-end sale is live';
+      if ($('promo-sub')) $('promo-sub').textContent = 'Save on selected styles before the clock runs out.';
+      if ($('promo-btn')) {
+        $('promo-btn').textContent = promoBanner.button_text || 'Shop the sale';
+        $('promo-btn').onclick = () => shop('Sale');
+      }
+      $('promo-img').innerHTML = `<img src="${esc(promoBanner.image || '')}" alt="${esc(promoBanner.title || 'Sale')}" onerror="this.src='https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1200&q=80'">`;
+    } else {
+      $('promo-img').innerHTML = `<img src="${esc(saleItems[0].image || '')}" alt="Sale" onerror="this.src='https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1200&q=80'">`;
+    }
     tick();
-    setInterval(tick, 1000);
+    if (!window._promoTick) {
+      window._promoTick = setInterval(tick, 1000);
+    }
+  } else {
+    $('promo-section').style.display = 'none';
   }
 
   // reviews
