@@ -569,9 +569,21 @@ async function view(id, fromRoute) {
 
   updateStockUI();
   if ($('share-row')) {
+    const wa = 'https://wa.me/?text=' + encodeURIComponent((cur.name || 'FARFITS') + '\n' + shareUrl);
     $('share-row').innerHTML = `
-      <button class="btn o" type="button" onclick="shareProduct()" style="width:100%">Share product</button>
-      <small style="display:block;margin-top:8px;color:var(--mu);word-break:break-all">${esc(shareUrl)}</small>`;
+      <div style="background:var(--cd);border:1.5px solid var(--ln);border-radius:14px;padding:1rem;margin-top:.4rem">
+        <b style="display:block;margin-bottom:6px">Share this product</b>
+        <p style="font-size:.85rem;color:var(--mu);margin-bottom:10px;line-height:1.4">
+          For WhatsApp / Facebook previews (photo + name), share the link below — not the address bar URL.
+        </p>
+        <input id="share-url" readonly value="${esc(shareUrl)}"
+          style="width:100%;padding:10px 12px;border:1.5px solid var(--ln);border-radius:10px;font-size:.82rem;margin-bottom:10px;background:var(--bg)"
+          onclick="this.select()">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn o" type="button" onclick="copyShareLink()">Copy link</button>
+          <a class="btn" href="${esc(wa)}" target="_blank" rel="noopener" style="text-align:center">WhatsApp</a>
+        </div>
+      </div>`;
   }
   $('rel').innerHTML = products
     .filter(p => p.category === cur.category && p.id !== cur.id)
@@ -589,12 +601,24 @@ function absUrl(u) {
 }
 
 function productShareUrl(id) {
-  // Worker share page has real OG tags for WhatsApp / Facebook / etc.
+  // Worker /p/{id} has real Open Graph tags for WhatsApp / Facebook
   return API.replace(/\/$/, '') + '/p/' + id;
 }
 
 function productPageUrl(id) {
   return SITE + '/#/product/' + id;
+}
+
+async function copyShareLink() {
+  const url = (cur && productShareUrl(cur.id)) || ($('share-url') && $('share-url').value) || '';
+  if (!url) return;
+  try {
+    await navigator.clipboard.writeText(url);
+    alert('Share link copied!\n\nPaste this in WhatsApp so the product image and name show in the preview.');
+  } catch {
+    if ($('share-url')) { $('share-url').select(); }
+    prompt('Copy this share link:', url);
+  }
 }
 
 async function shareProduct() {
@@ -608,12 +632,7 @@ async function shareProduct() {
       return;
     }
   } catch (_) {}
-  try {
-    await navigator.clipboard.writeText(url);
-    alert('Product link copied!\n\n' + url);
-  } catch {
-    prompt('Copy this product link:', url);
-  }
+  copyShareLink();
 }
 
 function updateProductPrice() {
