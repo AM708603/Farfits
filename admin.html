@@ -622,16 +622,20 @@ td .actions {
   flex: 1;
   min-width: 160px;
 }
+#print-area {
+  display: none !important;
+}
 @media print {
-  body * { visibility: hidden; }
-  #print-area, #print-area * { visibility: visible; }
+  body * { visibility: hidden !important; }
   #print-area {
+    display: block !important;
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    visibility: visible !important;
   }
-  .no-print { display: none !important; }
+  #print-area * { visibility: visible !important; }
 }
 .invoice {
   font-family: 'DM Sans', system-ui, sans-serif;
@@ -1691,7 +1695,11 @@ function printOrders(list) {
     document.body.appendChild(area);
   }
   area.innerHTML = list.map(invoiceHtml).join('');
+  const cleanup = () => { area.innerHTML = ''; };
+  window.addEventListener('afterprint', cleanup, { once: true });
   window.print();
+  // Fallback if afterprint doesn't fire
+  setTimeout(cleanup, 1000);
 }
 
 function ov(i) {
