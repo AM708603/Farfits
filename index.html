@@ -156,7 +156,10 @@ footer h4{font-family:var(--hf);color:var(--li);margin-bottom:1rem}footer li,foo
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
     </button>
     <div class="search-panel" id="search-panel">
-      <input id="sq" type="search" placeholder="Search shoes, categories…" autocomplete="off" oninput="doSearch()" onkeydown="if(event.key==='Enter')doSearch(true)">
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input id="sq" type="search" placeholder="Search shoes, categories…" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch(true)}">
+        <button class="btn" type="button" style="padding:.7rem 1rem;white-space:nowrap" onclick="doSearch(true)">Search</button>
+      </div>
       <div class="search-results" id="sres"></div>
     </div>
   </div>
@@ -294,24 +297,54 @@ function nav(id) {
   setTimeout(obs, 30);
 }
 
-function shop(c) {
+let shopQuery = '';
+
+function shop(c, keepQuery) {
   cat = c;
+  if (!keepQuery) shopQuery = '';
   nav('shop');
   $('sh').textContent = c === 'all' ? 'All products' : name(c);
   const catNames = ['all', 'Sale', ...categories.map(x => x.name)];
-  $('chips').innerHTML = catNames.map(x =>
+  $('chips').innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%;align-items:center;margin-bottom:4px">
+      <input id="shop-q" type="search" placeholder="Search products…" value="${esc(shopQuery)}"
+        style="flex:1;min-width:160px;padding:10px 14px;border:1.5px solid var(--ln);border-radius:10px;font:inherit;background:var(--cd)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();runShopSearch()}">
+      <button class="btn" type="button" onclick="runShopSearch()" style="padding:.7rem 1.2rem">Search</button>
+      ${shopQuery ? `<button class="btn o" type="button" onclick="shopQuery='';shop(cat)">Clear</button>` : ''}
+    </div>
+  ` + catNames.map(x =>
     `<button class="chip ${x === c ? 'on' : ''}" onclick="shop('${esc(x)}')">${name(x)}</button>`
-  ).join('') + `<select aria-label="Sort" onchange="sort=this.value;shop(cat)">
+  ).join('') + `<select aria-label="Sort" onchange="sort=this.value;shop(cat,true)">
     <option value="">Featured</option>
     <option value="a" ${sort === 'a' ? 'selected' : ''}>Price: low to high</option>
     <option value="d" ${sort === 'd' ? 'selected' : ''}>Price: high to low</option>
   </select>`;
-  let list = products.filter(p => inCat(p, c));
+  renderShopGrid();
+  obs();
+}
+
+function runShopSearch() {
+  const el = $('shop-q');
+  shopQuery = (el && el.value || '').trim();
+  shop(cat, true);
+}
+
+function renderShopGrid() {
+  const q = shopQuery.toLowerCase();
+  let list = products.filter(p => inCat(p, cat));
+  if (q) {
+    list = list.filter(p =>
+      (p.name || '').toLowerCase().includes(q) ||
+      (p.category || '').toLowerCase().includes(q) ||
+      (p.label || '').toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q)
+    );
+  }
   if (sort) list = [...list].sort((x, y) => sort === 'a' ? x.price - y.price : y.price - x.price);
   $('sp').innerHTML = list.length
     ? list.map(card).join('')
-    : '<div class="empty"><h3>No products yet</h3><p style="color:var(--mu)">Check back soon.</p></div>';
-  obs();
+    : `<div class="empty"><h3>${q ? 'No products match your search' : 'No products yet'}</h3><p style="color:var(--mu)">${q ? 'Try another keyword or clear the search.' : 'Check back soon.'}</p></div>`;
 }
 
 // ========== Product detail ==========
@@ -728,33 +761,36 @@ function toggleSearch() {
   p.classList.toggle('on');
   if (p.classList.contains('on')) {
     $('sq').focus();
-    doSearch();
+    $('sres').innerHTML = '<div class="sr-empty">Type a name and press Search</div>';
   }
 }
 
-function doSearch(goFirst) {
-  const q = ($('sq').value || '').trim().toLowerCase();
+function doSearch(goShop) {
+  const q = ($('sq').value || '').trim();
   const box = $('sres');
   if (!q) {
     box.innerHTML = '<div class="sr-empty">Type a product or category name</div>';
     return;
   }
+  const ql = q.toLowerCase();
   const list = products.filter(p =>
-    (p.name || '').toLowerCase().includes(q) ||
-    (p.category || '').toLowerCase().includes(q) ||
-    (p.label || '').toLowerCase().includes(q) ||
-    (p.description || '').toLowerCase().includes(q)
-  ).slice(0, 8);
+    (p.name || '').toLowerCase().includes(ql) ||
+    (p.category || '').toLowerCase().includes(ql) ||
+    (p.label || '').toLowerCase().includes(ql) ||
+    (p.description || '').toLowerCase().includes(ql)
+  );
   if (!list.length) {
     box.innerHTML = '<div class="sr-empty">No products found</div>';
     return;
   }
-  if (goFirst) {
+  // Open shop with this query when Search is clicked
+  if (goShop) {
     $('search-panel').classList.remove('on');
-    view(list[0].id);
+    shopQuery = q;
+    shop('all', true);
     return;
   }
-  box.innerHTML = list.map(p => `
+  box.innerHTML = list.slice(0, 8).map(p => `
     <button type="button" class="sr-item" onclick="$('search-panel').classList.remove('on');view(${p.id})">
       <img src="${esc(p.image || '')}" alt="" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=100&q=80'">
       <div><b>${esc(p.name)}</b><small>${esc(p.category || '')} · ${fmt(p.price)}</small></div>
