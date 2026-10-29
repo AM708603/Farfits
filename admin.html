@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>FARFITS Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--ink:#0b1f3a;--cd:#fff;--li:#c9a14a;--rd:#d6333a;--gn:#1f8a4c;--mu:#5b6678;--ln:rgba(11,31,58,.14)}
+@media(prefers-color-scheme:dark){:root{--bg:#0a1424;--ink:#eef1f6;--cd:#122039;--mu:#97a3b8;--ln:rgba(255,255,255,.14)}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--li);outline-offset:2px}
+.btn{padding:9px 16px;border-radius:9px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:700;cursor:pointer}
+.btn.o{background:none;color:var(--ink)}.btn.r{background:var(--rd);border-color:var(--rd);color:#fff}.btn.s{padding:5px 10px;font-size:.85rem}
+input,select,textarea{width:100%;padding:10px 12px;background:var(--cd);border:1.5px solid var(--ln);border-radius:9px}
+label{display:block;font-size:.85rem;color:var(--mu);margin:12px 0 4px}
+#login{max-width:340px;margin:18vh auto;padding:2rem;background:var(--cd);border:1px solid var(--ln);border-radius:16px}
+#login .btn{width:100%;margin-top:16px}
+#app{display:none;grid-template-columns:210px 1fr;min-height:100vh}
+aside{background:var(--ink);color:#fff;padding:1.2rem .8rem;position:sticky;top:0;height:100vh}
+aside h2{padding:0 .8rem 1rem;letter-spacing:.18em;font-size:1rem}
+aside button{display:block;width:100%;text-align:left;background:none;border:0;color:#c3ccdb;padding:10px 12px;border-radius:9px;cursor:pointer}
+aside button.on,aside button:hover{background:rgba(255,255,255,.1);color:#fff}
+aside button.on{box-shadow:inset 3px 0 var(--li)}
+main{padding:1.8rem;min-width:0}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}.hd h2{font-size:1.7rem}
+.tw{overflow-x:auto;background:var(--cd);border:1px solid var(--ln);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--ln);white-space:nowrap}th{color:var(--mu);font-weight:500}tr:last-child td{border:0}
+td img{width:44px;height:44px;object-fit:cover;border-radius:8px;display:block}
+.st{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:1.2rem}
+.sc{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:1rem 1.2rem}.sc b{display:block;font-family:'Bricolage Grotesque';font-size:1.7rem}.sc span{color:var(--mu);font-size:.85rem}
+.two{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}.box{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:1.2rem}.box h3{font-size:1.1rem;margin-bottom:.8rem}
+.bars{display:flex;align-items:end;gap:6px;height:160px}.bars div{flex:1;background:var(--li);border-radius:5px 5px 0 0;min-height:2px}.bl{display:flex;gap:6px;font-size:.68rem;color:var(--mu)}.bl span{flex:1;text-align:center}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--ln);gap:1rem}
+.pill{padding:3px 10px;border-radius:99px;background:var(--ln);font-size:.8rem;font-weight:700}
+.bulk{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}.bulk select,.bulk input{width:auto}
+#md{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:50;padding:1rem}#md.on{display:grid}
+#mb{background:var(--bg);border-radius:16px;padding:1.5rem;max-width:620px;width:100%;max-height:90vh;overflow:auto}
+.vr{display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr auto;gap:6px;margin-bottom:6px}
+.pv{width:90px;height:90px;object-fit:cover;border-radius:10px;margin-top:6px;display:block}
+.ft{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+@media(max-width:800px){#app{grid-template-columns:1fr}aside{position:static;height:auto;display:flex;overflow-x:auto;padding:.5rem}aside h2{display:none}aside button{white-space:nowrap;width:auto}.two{grid-template-columns:1fr}.vr{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<form id="login" onsubmit="login(event)"><h2>FARFITS admin</h2><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required><button class="btn">Sign in</button></form>
+<div id="app"><aside><h2>FARFITS</h2><div id="nav"></div><button onclick="logout()" style="margin-top:1rem">Sign out</button></aside><main id="v"></main></div>
+<div id="md"><div id="mb"></div></div>
+
+<script>
+// 1) After deploying the Worker, paste its URL here
+const API = localStorage.api || 'https://farfits-api.YOURNAME.workers.dev';
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
+const fmt = n => 'Rs ' + Math.round(n || 0).toLocaleString('en-PK');
+let tok = localStorage.tok, tab = 'dash', cats = [];
+
+async function call(path, method = 'GET', body, raw) {
+  const r = await fetch(API + path, { method, headers: { Authorization: 'Bearer ' + tok, ...(raw ? { 'content-type': raw.type } : { 'content-type': 'application/json' }) }, body: raw || (body && JSON.stringify(body)) });
+  if (r.status === 401) { logout(); throw new Error('Session expired'); }
+  const d = await r.json();
+  if (!r.ok) { alert(d.error || 'Something went wrong'); throw new Error(d.error); }
+  return d;
+}
+async function login(e) {
+  e.preventDefault();
+  try { const r = await fetch(API + '/api/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: $('#pw').value }) }), d = await r.json();
+    if (!r.ok) return alert(d.error); tok = localStorage.tok = d.token; boot(); } catch { alert('Cannot reach the API. Check the API address at the top of admin.html.'); }
+}
+function logout() { localStorage.removeItem('tok'); tok = null; location.reload(); }
+
+// field types: t=text n=number a=textarea i=image c=category k=checkbox v=variants
+const CFG = {
+  products: { title: 'Products', cols: ['image', 'name', 'category', 'price', 'compare_price', 'active'], f: [['name', 'Name'], ['category', 'Category', 'c'], ['price', 'Sale price (Rs)', 'n'], ['compare_price', 'Original price (Rs, 0 for none)', 'n'], ['label', 'Label (e.g. Best Seller)'], ['image', 'Main image', 'i'], ['description', 'Description', 'a'], ['variants', 'Variants (size / colour, stock)', 'v'], ['active', 'Visible in store', 'k']] },
+  categories: { title: 'Categories', cols: ['image', 'name', 'sort'], f: [['name', 'Name'], ['image', 'Image', 'i'], ['sort', 'Sort order', 'n']] },
+  banners: { title: 'Banners', cols: ['image', 'title', 'subtitle', 'sort', 'active'], f: [['title', 'Headline'], ['subtitle', 'Subtext'], ['button_text', 'Button text'], ['link', 'Button link (e.g. Sale, Basketball)'], ['image', 'Banner image', 'i'], ['sort', 'Sort order', 'n'], ['active', 'Visible in store', 'k']] },
+  delivery: { title: 'Delivery charges', cols: ['city', 'charge', 'free_above', 'active'], f: [['city', 'City (use * for all other cities)'], ['charge', 'Delivery charge (Rs)', 'n'], ['free_above', 'Free delivery above (Rs, 0 = never)', 'n'], ['active', 'Active', 'k']] },
+  payments: { title: 'Payment methods', cols: ['name', 'account', 'proof', 'active'], f: [['name', 'Method name (e.g. JazzCash)'], ['account', 'Account number / IBAN'], ['instructions', 'Instructions shown at checkout', 'a'], ['proof', 'Customer must send transaction ID + screenshot', 'k'], ['active', 'Active', 'k']] }
+};
+const NAV = [['dash', 'Dashboard'], ['orders', 'Orders'], ...Object.entries(CFG).map(([k, v]) => [k, v.title])];
+
+function boot() {
+  $('#login').style.display = 'none'; $('#app').style.display = 'grid';
+  $('#nav').innerHTML = NAV.map(([k, n]) => `<button data-k="${k}" onclick="go('${k}')">${n}</button>`).join(''); go('dash');
+}
+function go(k) { tab = k; document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.k === k)); k === 'dash' ? dash() : k === 'orders' ? orders() : list(k); }
+
+/* ---------- dashboard ---------- */
+async function dash() {
+  $('#v').innerHTML = '<div class="hd"><h2>Dashboard</h2></div>Loading…';
+  const a = await call('/api/admin/analytics'), days = Object.entries(a.days), mx = Math.max(1, ...days.map(d => d[1].revenue));
+  $('#v').innerHTML = `<div class="hd"><h2>Dashboard</h2></div>
+  <div class="st"><div class="sc"><b>${fmt(a.revenue)}</b><span>Revenue (excl. cancelled)</span></div><div class="sc"><b>${a.orders}</b><span>Total orders</span></div><div class="sc"><b>${fmt(a.aov)}</b><span>Average order value</span></div><div class="sc"><b>${a.byStatus.pending || 0}</b><span>Pending orders</span></div></div>
+  <div class="two"><div class="box"><h3>Revenue, last 14 days</h3><div class="bars">${days.map(([d, v]) => `<div title="${d}: ${fmt(v.revenue)} (${v.orders} orders)" style="height:${v.revenue / mx * 100}%"></div>`).join('')}</div><div class="bl">${days.map(([d]) => `<span>${d.slice(8)}</span>`).join('')}</div></div>
+  <div class="box"><h3>Orders by status</h3>${Object.entries(a.byStatus).map(([s, n]) => `<div class="row"><span>${s}</span><b>${n}</b></div>`).join('') || 'No orders yet.'}</div>
+  <div class="box"><h3>Top products</h3>${a.top.map(t => `<div class="row"><span>${esc(t.name)} × ${t.qty}</span><b>${fmt(t.revenue)}</b></div>`).join('') || 'No sales yet.'}</div>
+  <div class="box"><h3>Top cities</h3>${a.cities.map(c => `<div class="row"><span>${esc(c[0])}</span><b>${c[1]}</b></div>`).join('') || 'No orders yet.'}<h3 style="margin-top:1rem">Low stock</h3>${a.lowStock.map(l => `<div class="row"><span>${esc(l.name)} (${esc(l.v)})</span><b style="color:var(--rd)">${l.stock}</b></div>`).join('') || 'All variants are stocked.'}</div></div>`;
+}
+
+/* ---------- generic list + form ---------- */
+async function list(t) {
+  const c = CFG[t], rows = await call('/api/admin/' + t); if (t === 'products' || t === 'categories') cats = t === 'categories' ? rows : await call('/api/admin/categories');
+  window._rows = rows;
+  $('#v').innerHTML = `<div class="hd"><h2>${c.title}</h2><button class="btn" onclick="form('${t}')">Add new</button></div><div class="tw"><table><tr>${c.cols.map(k => `<th>${k.replace('_', ' ')}</th>`).join('')}<th></th></tr>${rows.map((r, i) => `<tr>${c.cols.map(k => `<td>${k === 'image' ? (r[k] ? `<img src="${esc(r[k])}" alt="">` : '') : ['active', 'proof'].includes(k) ? (r[k] ? 'Yes' : 'No') : ['price', 'compare_price', 'charge', 'free_above'].includes(k) ? fmt(r[k]) : esc(r[k])}</td>`).join('')}<td><button class="btn o s" onclick="form('${t}',${i})">Edit</button> <button class="btn r s" onclick="del('${t}',${r.id})">Delete</button></td></tr>`).join('') || `<tr><td colspan="9">Nothing here yet. Select Add new to create the first one.</td></tr>`}</table></div>`;
+}
+async function del(t, id) { if (confirm('Delete this item?')) { await call(`/api/admin/${t}/${id}`, 'DELETE'); list(t); } }
+function form(t, i) {
+  const c = CFG[t], r = i === undefined ? { active: 1 } : window._rows[i];
+  $('#mb').innerHTML = `<h3>${i === undefined ? 'Add' : 'Edit'} ${c.title.toLowerCase().replace(/s$/, '')}</h3>` + c.f.map(([k, l, ty]) => {
+    const v = r[k] ?? '', id = 'f_' + k;
+    if (ty === 'a') return `<label for="${id}">${l}</label><textarea id="${id}" rows="3">${esc(v)}</textarea>`;
+    if (ty === 'k') return `<label><input type="checkbox" id="${id}" style="width:auto" ${v ? 'checked' : ''}> ${l}</label>`;
+    if (ty === 'c') return `<label for="${id}">${l}</label><select id="${id}"><option value="">None</option>${cats.map(x => `<option ${x.name === v ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`;
+    if (ty === 'i') return `<label for="${id}">${l}</label><input type="file" accept="image/*" onchange="img(this,'${id}')"><input type="hidden" id="${id}" value="${esc(v)}"><img class="pv" id="${id}_p" src="${esc(v)}" alt="" ${v ? '' : 'hidden'}>`;
+    if (ty === 'v') return `<label>${l}</label><div id="vs">${(v || []).map(vr).join('')}</div><button class="btn o s" type="button" onclick="$('#vs').insertAdjacentHTML('beforeend',vr({}))">Add variant</button>`;
+    return `<label for="${id}">${l}</label><input id="${id}" type="${ty === 'n' ? 'number' : 'text'}" value="${esc(v)}">`;
+  }).join('') + `<div class="ft"><button class="btn o" onclick="$('#md').classList.remove('on')">Cancel</button><button class="btn" onclick="save('${t}',${r.id || 0})">Save</button></div>`;
+  $('#md').classList.add('on');
+}
+const vr = v => `<div class="vr"><input placeholder="Name e.g. 42 / Black" value="${esc(v.name)}"><input placeholder="SKU" value="${esc(v.sku)}"><input type="number" placeholder="Price (opt.)" value="${v.price || ''}"><input type="number" placeholder="Stock" value="${v.stock ?? ''}"><button class="btn r s" type="button" onclick="this.parentNode.remove()">×</button></div>`;
+async function img(inp, id) {
+  const f = inp.files[0]; if (!f) return;
+  const d = await call('/api/admin/upload', 'POST', null, Object.assign(f, {}) && new Blob([f], { type: f.type }));
+  $('#' + id).value = d.url; const p = $('#' + id + '_p'); p.src = d.url; p.hidden = false;
+}
+async function save(t, id) {
+  const b = {};
+  CFG[t].f.forEach(([k, , ty]) => { const e = $('#f_' + k) || $('#vs'); b[k] = ty === 'k' ? +$('#f_' + k).checked : ty === 'v' ? [...document.querySelectorAll('#vs .vr')].map(r => { const x = r.querySelectorAll('input'); return { name: x[0].value.trim(), sku: x[1].value.trim(), price: +x[2].value || 0, stock: +x[3].value || 0 }; }).filter(v => v.name) : ty === 'n' ? +e.value || 0 : e.value; });
+  if (!(b.name || b.title || b.city)) return alert('Please fill in the name.');
+  await call(`/api/admin/${t}${id ? '/' + id : ''}`, id ? 'PUT' : 'POST', b); $('#md').classList.remove('on'); list(t);
+}
+
+/* ---------- orders ---------- */
+const STAT = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'returned'];
+async function orders() {
+  $('#v').innerHTML = `<div class="hd"><h2>Orders</h2><button class="btn o" onclick="csv()">Export CSV</button></div>
+  <div class="bulk"><input id="oq" placeholder="Search order no, name, phone" oninput="clearTimeout(window._t);window._t=setTimeout(loadO,300)"><select id="os" onchange="loadO()"><option value="">All statuses</option>${STAT.map(s => `<option>${s}</option>`).join('')}</select>
+  <span style="margin-left:auto">With selected:</span><select id="bs">${STAT.map(s => `<option>${s}</option>`).join('')}</select><button class="btn s" onclick="bulk('status')">Set status</button><button class="btn s" onclick="bulk('courier')">Book courier</button></div>
+  <div class="tw"><table id="ot"></table></div>`; loadO();
+}
+async function loadO() {
+  const rows = window._o = await call(`/api/admin/orders?status=${$('#os').value}&q=${encodeURIComponent($('#oq').value)}`);
+  $('#ot').innerHTML = `<tr><th><input type="checkbox" style="width:auto" onchange="document.querySelectorAll('.oc').forEach(c=>c.checked=this.checked)" aria-label="Select all"></th><th>Order</th><th>Customer</th><th>City</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th></th></tr>` +
+    (rows.map((o, i) => `<tr><td><input class="oc" type="checkbox" style="width:auto" value="${o.id}"></td><td><b>${o.order_no}</b></td><td>${esc(o.name)}<br><small>${esc(o.phone)}</small></td><td>${esc(o.city)}</td><td>${fmt(o.total)}</td><td>${esc(o.payment)}</td><td><span class="pill">${o.status}</span>${o.tracking ? `<br><small>${esc(o.courier)} ${esc(o.tracking)}</small>` : ''}</td><td>${o.created_at.slice(0, 10)}</td><td><button class="btn o s" onclick="ov(${i})">View</button></td></tr>`).join('') || '<tr><td colspan="9">No orders found.</td></tr>');
+}
+async function bulk(action) {
+  const ids = [...document.querySelectorAll('.oc:checked')].map(c => +c.value); if (!ids.length) return alert('Select at least one order.');
+  if (!confirm(`${action === 'courier' ? 'Book courier for' : 'Update'} ${ids.length} order(s)?`)) return;
+  const r = await call('/api/admin/orders/bulk', 'POST', { ids, action, status: $('#bs').value }), bad = r.filter(x => x.error);
+  if (bad.length) alert(`${r.length - bad.length} done, ${bad.length} failed:\n` + bad.map(x => '#' + x.id + ': ' + x.error).join('\n')); loadO();
+}
+function ov(i) {
+  const o = window._o[i], it = JSON.parse(o.items || '[]');
+  $('#mb').innerHTML = `<h3>${o.order_no}</h3><p>${esc(o.name)} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>${o.email ? ' · ' + esc(o.email) : ''}</p><p>${esc(o.address)}, ${esc(o.city)}</p>
+  <div style="margin:12px 0">${it.map(x => `<div class="row"><span>${esc(x.name)} ${esc(x.v)} × ${x.qty}</span><span>${fmt(x.price * x.qty)}</span></div>`).join('')}<div class="row"><span>Delivery</span><span>${fmt(o.shipping)}</span></div><div class="row"><b>Total (${esc(o.payment)})</b><b>${fmt(o.total)}</b></div></div>
+  ${o.tid ? `<p>Transaction ID: <b>${esc(o.tid)}</b></p>` : ''}${o.proof ? `<a href="${esc(o.proof)}" target="_blank" rel="noopener"><img class="pv" style="width:140px;height:140px" src="${esc(o.proof)}" alt="Payment proof"></a>` : ''}
+  <label>Status</label><select id="o_s">${STAT.map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}</select><label>Courier</label><input id="o_c" value="${esc(o.courier)}"><label>Tracking number</label><input id="o_t" value="${esc(o.tracking)}">
+  <div class="ft"><button class="btn o" onclick="window.print()">Print</button><button class="btn o" onclick="$('#md').classList.remove('on')">Close</button><button class="btn" onclick="so(${o.id})">Save</button></div>`;
+  $('#md').classList.add('on');
+}
+async function so(id) { await call('/api/admin/orders/' + id, 'PUT', { status: $('#o_s').value, courier: $('#o_c').value, tracking: $('#o_t').value }); $('#md').classList.remove('on'); loadO(); }
+function csv() {
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"', h = ['order_no', 'name', 'phone', 'city', 'address', 'total', 'payment', 'status', 'created_at'];
+  const b = new Blob([[h.join(','), ...window._o.map(o => h.map(k => q(o[k])).join(','))].join('\n')], { type: 'text/csv' }), a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = 'orders.csv'; a.click();
+}
+$('#md').addEventListener('click', e => { if (e.target.id === 'md') e.target.classList.remove('on'); });
+if (tok) boot();
+</script>
+</body>
+</html>
