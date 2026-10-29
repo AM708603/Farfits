@@ -355,8 +355,17 @@ function renderGallery(variantName) {
     : '';
 }
 
-function view(id) {
-  cur = products.find(p => p.id === id);
+async function view(id) {
+  // Pull latest stock before showing product
+  try {
+    const r = await fetch(API + '/api/public/store');
+    if (r.ok) {
+      const d = await r.json();
+      products = d.products || products;
+    }
+  } catch (_) {}
+
+  cur = products.find(p => p.id == id);
   if (!cur) return;
   pqty = 1;
   const variants = cur.variants || [];
@@ -623,6 +632,8 @@ async function order() {
     $('tid').value = '';
     $('shot').value = '';
     if ($('shp')) $('shp').hidden = true;
+    // Refresh catalog so stock matches admin (sold units removed)
+    await refreshStock();
     showThanks(lastOrder);
   } catch (e) {
     alert(e.message || 'Could not place order. Please try again.');
@@ -887,6 +898,21 @@ function onScroll() {
 addEventListener('scroll', () => { if (!tk) { tk = true; requestAnimationFrame(onScroll); } }, { passive: true });
 
 // ========== Bootstrap from API ==========
+async function refreshStock() {
+  try {
+    const r = await fetch(API + '/api/public/store');
+    if (!r.ok) return;
+    const d = await r.json();
+    products = d.products || [];
+    categories = d.categories || categories;
+    // Keep UI in sync if home/shop grids are visible
+    if ($('hp')) renderHome();
+    if ($('p-shop') && $('p-shop').classList.contains('on')) shop(cat);
+  } catch (e) {
+    console.error('Stock refresh failed', e);
+  }
+}
+
 async function loadStore() {
   try {
     const r = await fetch(API + '/api/public/store');
