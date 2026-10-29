@@ -2,53 +2,730 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1f3a">
 <title>FARFITS Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f7f9;--ink:#0b1f3a;--cd:#fff;--li:#c9a14a;--rd:#d6333a;--gn:#1f8a4c;--mu:#5b6678;--ln:rgba(11,31,58,.14)}
-@media(prefers-color-scheme:dark){:root{--bg:#0a1424;--ink:#eef1f6;--cd:#122039;--mu:#97a3b8;--ln:rgba(255,255,255,.14)}}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}
-button,input,select,textarea{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--li);outline-offset:2px}
-.btn{padding:9px 16px;border-radius:9px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:700;cursor:pointer}
-.btn.o{background:none;color:var(--ink)}.btn.r{background:var(--rd);border-color:var(--rd);color:#fff}.btn.s{padding:5px 10px;font-size:.85rem}
-input,select,textarea{width:100%;padding:10px 12px;background:var(--cd);border:1.5px solid var(--ln);border-radius:9px}
-label{display:block;font-size:.85rem;color:var(--mu);margin:12px 0 4px}
-#login{max-width:340px;margin:18vh auto;padding:2rem;background:var(--cd);border:1px solid var(--ln);border-radius:16px}
-#login .btn{width:100%;margin-top:16px}
-#app{display:none;grid-template-columns:210px 1fr;min-height:100vh}
-aside{background:var(--ink);color:#fff;padding:1.2rem .8rem;position:sticky;top:0;height:100vh}
-aside h2{padding:0 .8rem 1rem;letter-spacing:.18em;font-size:1rem}
-aside button{display:block;width:100%;text-align:left;background:none;border:0;color:#c3ccdb;padding:10px 12px;border-radius:9px;cursor:pointer}
-aside button.on,aside button:hover{background:rgba(255,255,255,.1);color:#fff}
-aside button.on{box-shadow:inset 3px 0 var(--li)}
-main{padding:1.8rem;min-width:0}
-.hd{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}.hd h2{font-size:1.7rem}
-.tw{overflow-x:auto;background:var(--cd);border:1px solid var(--ln);border-radius:14px}
-table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--ln);white-space:nowrap}th{color:var(--mu);font-weight:500}tr:last-child td{border:0}
-td img{width:44px;height:44px;object-fit:cover;border-radius:8px;display:block}
-.st{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:1.2rem}
-.sc{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:1rem 1.2rem}.sc b{display:block;font-family:'Bricolage Grotesque';font-size:1.7rem}.sc span{color:var(--mu);font-size:.85rem}
-.two{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}.box{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:1.2rem}.box h3{font-size:1.1rem;margin-bottom:.8rem}
-.bars{display:flex;align-items:end;gap:6px;height:160px}.bars div{flex:1;background:var(--li);border-radius:5px 5px 0 0;min-height:2px}.bl{display:flex;gap:6px;font-size:.68rem;color:var(--mu)}.bl span{flex:1;text-align:center}
-.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--ln);gap:1rem}
-.pill{padding:3px 10px;border-radius:99px;background:var(--ln);font-size:.8rem;font-weight:700}
-.bulk{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}.bulk select,.bulk input{width:auto}
-#md{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:50;padding:1rem}#md.on{display:grid}
-#mb{background:var(--bg);border-radius:16px;padding:1.5rem;max-width:620px;width:100%;max-height:90vh;overflow:auto}
-.vr{display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr auto;gap:6px;margin-bottom:6px}
-.pv{width:90px;height:90px;object-fit:cover;border-radius:10px;margin-top:6px;display:block}
-.ft{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-@media(max-width:800px){#app{grid-template-columns:1fr}aside{position:static;height:auto;display:flex;overflow-x:auto;padding:.5rem}aside h2{display:none}aside button{white-space:nowrap;width:auto}.two{grid-template-columns:1fr}.vr{grid-template-columns:1fr 1fr}}
+:root {
+  --bg: #f4f6f9;
+  --bg-2: #eef1f6;
+  --ink: #0b1f3a;
+  --ink-2: #1a2f4a;
+  --cd: #ffffff;
+  --cd-hover: #f8fafc;
+  --li: #c9a14a;
+  --li-soft: rgba(201, 161, 74, 0.12);
+  --li-strong: #b08d3a;
+  --rd: #d6333a;
+  --rd-soft: rgba(214, 51, 58, 0.1);
+  --gn: #1f8a4c;
+  --gn-soft: rgba(31, 138, 76, 0.1);
+  --mu: #5b6678;
+  --mu-2: #8a94a6;
+  --ln: rgba(11, 31, 58, 0.09);
+  --ln-strong: rgba(11, 31, 58, 0.16);
+  --shadow-sm: 0 1px 2px rgba(11, 31, 58, 0.04);
+  --shadow: 0 4px 16px rgba(11, 31, 58, 0.06);
+  --shadow-lg: 0 12px 40px rgba(11, 31, 58, 0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --sidebar-w: 240px;
+  --transition: 0.18s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #080f1a;
+    --bg-2: #0c1524;
+    --ink: #eef1f6;
+    --ink-2: #d0d7e4;
+    --cd: #111c30;
+    --cd-hover: #16233a;
+    --li: #d4b05e;
+    --li-soft: rgba(212, 176, 94, 0.15);
+    --li-strong: #e0c070;
+    --mu: #8b97ab;
+    --mu-2: #6b778c;
+    --ln: rgba(255, 255, 255, 0.07);
+    --ln-strong: rgba(255, 255, 255, 0.12);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.35);
+  }
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  font-size: 15px;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--li);
+  outline-offset: 2px;
+}
+
+img { max-width: 100%; display: block; }
+
+/* ========== Buttons ========== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid transparent;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background var(--transition), transform 0.1s, box-shadow var(--transition);
+  white-space: nowrap;
+  user-select: none;
+}
+.btn:hover { background: var(--ink-2); }
+.btn:active { transform: scale(0.98); }
+.btn.o {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ln-strong);
+}
+.btn.o:hover { background: var(--li-soft); border-color: var(--li); color: var(--li-strong); }
+.btn.r {
+  background: var(--rd);
+  border-color: var(--rd);
+  color: #fff;
+}
+.btn.r:hover { background: #c02a30; }
+.btn.s {
+  padding: 5px 11px;
+  font-size: 0.82rem;
+  border-radius: 6px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========== Form controls ========== */
+input, select, textarea {
+  width: 100%;
+  padding: 10px 13px;
+  background: var(--cd);
+  border: 1.5px solid var(--ln);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+input:hover, select:hover, textarea:hover {
+  border-color: var(--ln-strong);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--li);
+  box-shadow: 0 0 0 3px var(--li-soft);
+  outline: none;
+}
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--li);
+  cursor: pointer;
+}
+input[type="file"] {
+  padding: 8px;
+  font-size: 0.88rem;
+}
+label {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--mu);
+  margin: 14px 0 5px;
+}
+label:first-child { margin-top: 0; }
+
+/* ========== Login ========== */
+#login {
+  max-width: 380px;
+  margin: min(18vh, 120px) auto;
+  padding: 2.2rem 2rem;
+  background: var(--cd);
+  border: 1px solid var(--ln);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+#login h2 {
+  font-size: 1.55rem;
+  margin-bottom: 0.3rem;
+}
+#login .sub {
+  color: var(--mu);
+  font-size: 0.9rem;
+  margin-bottom: 1.4rem;
+}
+#login .btn {
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 12px;
+  font-size: 0.95rem;
+}
+
+/* ========== App shell ========== */
+#app {
+  display: none;
+  min-height: 100dvh;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-w);
+  height: 100dvh;
+  background: var(--ink);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+}
+.sidebar-brand {
+  padding: 1.35rem 1.25rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.sidebar-brand .logo {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--li), #e8c96a);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #0b1f3a;
+  letter-spacing: -0.03em;
+}
+.sidebar-brand h2 {
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: #fff;
+}
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.85rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sidebar-nav button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: rgba(255, 255, 255, 0.62);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background var(--transition), color var(--transition);
+}
+.sidebar-nav button:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+.sidebar-nav button.on {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--li);
+}
+.sidebar-nav button .icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+.sidebar-footer {
+  padding: 0.75rem 0.7rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.sidebar-footer button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background var(--transition), color var(--transition);
+}
+.sidebar-footer button:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+/* Overlay for mobile sidebar */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 35;
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.on { display: block; }
+
+/* Main content */
+.main {
+  margin-left: var(--sidebar-w);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--ln);
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+}
+.menu-btn {
+  display: none;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-left: -4px;
+}
+.menu-btn:hover { background: var(--li-soft); }
+.menu-btn svg { display: block; }
+.topbar h1 {
+  font-size: 1.35rem;
+  flex: 1;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.content {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+/* ========== Stats cards ========== */
+.st {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 1.4rem;
+}
+.sc {
+  background: var(--cd);
+  border: 1px solid var(--ln);
+  border-radius: var(--radius);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), border-color var(--transition);
+}
+.sc:hover {
+  box-shadow: var(--shadow);
+  border-color: var(--ln-strong);
+}
+.sc .label {
+  font-size: 0.8rem;
+  color: var(--mu);
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sc b {
+  display: block;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+/* ========== Layout helpers ========== */
+.two {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.two-bottom {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 14px;
+}
+.box {
+  background: var(--cd);
+  border: 1px solid var(--ln);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+.box h3 {
+  font-size: 0.98rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.box h3 .muted {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--mu);
+}
+
+/* Chart bars */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 150px;
+  padding-top: 8px;
+}
+.bars div {
+  flex: 1;
+  background: linear-gradient(180deg, var(--li) 0%, var(--li-strong) 100%);
+  border-radius: 5px 5px 2px 2px;
+  min-height: 3px;
+  transition: opacity 0.15s;
+  cursor: default;
+  position: relative;
+}
+.bars div:hover { opacity: 0.85; }
+.bl {
+  display: flex;
+  gap: 5px;
+  font-size: 0.65rem;
+  color: var(--mu);
+  margin-top: 8px;
+}
+.bl span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Rows / lists inside boxes */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ln);
+  gap: 12px;
+  font-size: 0.9rem;
+}
+.row:last-child { border-bottom: 0; }
+.row b { font-weight: 600; white-space: nowrap; }
+.empty-state {
+  color: var(--mu);
+  font-size: 0.9rem;
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+/* Status pills */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: var(--ln);
+  color: var(--ink);
+}
+.pill.pending { background: #fef3c7; color: #92400e; }
+.pill.confirmed { background: #dbeafe; color: #1e40af; }
+.pill.shipped { background: #e0e7ff; color: #3730a3; }
+.pill.delivered { background: #d1fae5; color: #065f46; }
+.pill.cancelled { background: #fee2e2; color: #991b1b; }
+.pill.returned { background: #f3e8ff; color: #6b21a8; }
+
+@media (prefers-color-scheme: dark) {
+  .pill.pending { background: rgba(251, 191, 36, 0.18); color: #fbbf24; }
+  .pill.confirmed { background: rgba(59, 130, 246, 0.18); color: #93c5fd; }
+  .pill.shipped { background: rgba(99, 102, 241, 0.18); color: #a5b4fc; }
+  .pill.delivered { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+  .pill.cancelled { background: rgba(239, 68, 68, 0.18); color: #fca5a5; }
+  .pill.returned { background: rgba(168, 85, 247, 0.18); color: #d8b4fe; }
+}
+
+/* ========== Tables ========== */
+.tw {
+  overflow-x: auto;
+  background: var(--cd);
+  border: 1px solid var(--ln);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  -webkit-overflow-scrolling: touch;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th, td {
+  padding: 11px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--ln);
+  white-space: nowrap;
+}
+th {
+  color: var(--mu);
+  font-weight: 500;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--bg-2);
+  position: sticky;
+  top: 0;
+}
+tr:last-child td { border-bottom: 0; }
+tr:hover td { background: var(--cd-hover); }
+td img {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 7px;
+}
+td .actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Bulk bar */
+.bulk {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.bulk select, .bulk input {
+  width: auto;
+  min-width: 140px;
+}
+.bulk .spacer { flex: 1; min-width: 8px; }
+
+/* Header row */
+.hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.hd h2 { font-size: 1.45rem; }
+
+/* ========== Modal ========== */
+#md {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  place-items: center;
+  z-index: 50;
+  padding: 1rem;
+  backdrop-filter: blur(3px);
+}
+#md.on { display: grid; }
+#mb {
+  background: var(--cd);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem 1.5rem;
+  max-width: 580px;
+  width: 100%;
+  max-height: 90dvh;
+  overflow: auto;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--ln);
+}
+#mb h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+.vr {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1fr 1fr auto;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+.pv {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 8px;
+  border: 1px solid var(--ln);
+}
+.ft {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ln);
+}
+
+/* Loading skeleton */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 3rem;
+  color: var(--mu);
+  font-size: 0.95rem;
+}
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--ln);
+  border-top-color: var(--li);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========== Responsive ========== */
+@media (max-width: 1100px) {
+  .st { grid-template-columns: repeat(2, 1fr); }
+  .two, .two-bottom { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 800px) {
+  :root { --sidebar-w: 260px; }
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .main { margin-left: 0; }
+  .menu-btn { display: flex; }
+  .content { padding: 1.1rem; }
+  .topbar { padding: 0.7rem 1rem; }
+  .st { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sc { padding: 1rem; }
+  .sc b { font-size: 1.4rem; }
+  .bulk select, .bulk input { min-width: 0; flex: 1; }
+  .vr { grid-template-columns: 1fr 1fr; }
+  .vr button { grid-column: span 2; }
+  th, td { padding: 10px 12px; }
+}
+
+@media (max-width: 480px) {
+  .st { grid-template-columns: 1fr; }
+  #login { margin: 10vh 1rem; padding: 1.6rem 1.3rem; }
+  .content { padding: 0.9rem; }
+  .hd h2 { font-size: 1.25rem; }
+  .btn { padding: 8px 13px; }
+}
 </style>
 </head>
 <body>
-<form id="login" onsubmit="login(event)"><h2>FARFITS admin</h2><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required><button class="btn">Sign in</button></form>
-<div id="app"><aside><h2>FARFITS</h2><div id="nav"></div><button onclick="logout()" style="margin-top:1rem">Sign out</button></aside><main id="v"></main></div>
+
+<!-- Login -->
+<form id="login" onsubmit="login(event)">
+  <h2>FARFITS</h2>
+  <p class="sub">Admin dashboard</p>
+  <label for="pw">Password</label>
+  <input id="pw" type="password" autocomplete="current-password" required placeholder="Enter admin password">
+  <button class="btn" type="submit">Sign in</button>
+</form>
+
+<!-- App -->
+<div id="app">
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">FF</div>
+      <h2>FARFITS</h2>
+    </div>
+    <nav class="sidebar-nav" id="nav"></nav>
+    <div class="sidebar-footer">
+      <button onclick="logout()">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()" aria-label="Open menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 id="page-title">Dashboard</h1>
+      <div class="topbar-actions" id="page-actions"></div>
+    </header>
+    <main class="content" id="v"></main>
+  </div>
+</div>
+
+<!-- Modal -->
 <div id="md"><div id="mb"></div></div>
 
 <script>
@@ -59,115 +736,488 @@ const fmt = n => 'Rs ' + Math.round(n || 0).toLocaleString('en-PK');
 let tok = localStorage.tok, tab = 'dash', cats = [];
 
 async function call(path, method = 'GET', body, raw) {
-  const r = await fetch(API + path, { method, headers: { Authorization: 'Bearer ' + tok, ...(raw ? { 'content-type': raw.type } : { 'content-type': 'application/json' }) }, body: raw || (body && JSON.stringify(body)) });
+  const r = await fetch(API + path, {
+    method,
+    headers: {
+      Authorization: 'Bearer ' + tok,
+      ...(raw ? { 'content-type': raw.type } : { 'content-type': 'application/json' })
+    },
+    body: raw || (body && JSON.stringify(body))
+  });
   if (r.status === 401) { logout(); throw new Error('Session expired'); }
   const d = await r.json();
   if (!r.ok) { alert(d.error || 'Something went wrong'); throw new Error(d.error); }
   return d;
 }
+
 async function login(e) {
   e.preventDefault();
-  try { const r = await fetch(API + '/api/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: $('#pw').value }) }), d = await r.json();
-    if (!r.ok) return alert(d.error); tok = localStorage.tok = d.token; boot(); } catch { alert('Cannot reach the API. Check the API address at the top of admin.html.'); }
+  try {
+    const r = await fetch(API + '/api/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ password: $('#pw').value })
+    });
+    const d = await r.json();
+    if (!r.ok) return alert(d.error);
+    tok = localStorage.tok = d.token;
+    boot();
+  } catch {
+    alert('Cannot reach the API. Check the API address at the top of admin.html.');
+  }
 }
-function logout() { localStorage.removeItem('tok'); tok = null; location.reload(); }
+
+function logout() {
+  localStorage.removeItem('tok');
+  tok = null;
+  location.reload();
+}
 
 // field types: t=text n=number a=textarea i=image c=category k=checkbox v=variants
 const CFG = {
-  products: { title: 'Products', cols: ['image', 'name', 'category', 'price', 'compare_price', 'active'], f: [['name', 'Name'], ['category', 'Category', 'c'], ['price', 'Sale price (Rs)', 'n'], ['compare_price', 'Original price (Rs, 0 for none)', 'n'], ['label', 'Label (e.g. Best Seller)'], ['image', 'Main image', 'i'], ['description', 'Description', 'a'], ['variants', 'Variants (size / colour, stock)', 'v'], ['active', 'Visible in store', 'k']] },
-  categories: { title: 'Categories', cols: ['image', 'name', 'sort'], f: [['name', 'Name'], ['image', 'Image', 'i'], ['sort', 'Sort order', 'n']] },
-  banners: { title: 'Banners', cols: ['image', 'title', 'subtitle', 'sort', 'active'], f: [['title', 'Headline'], ['subtitle', 'Subtext'], ['button_text', 'Button text'], ['link', 'Button link (e.g. Sale, Basketball)'], ['image', 'Banner image', 'i'], ['sort', 'Sort order', 'n'], ['active', 'Visible in store', 'k']] },
-  delivery: { title: 'Delivery charges', cols: ['city', 'charge', 'free_above', 'active'], f: [['city', 'City (use * for all other cities)'], ['charge', 'Delivery charge (Rs)', 'n'], ['free_above', 'Free delivery above (Rs, 0 = never)', 'n'], ['active', 'Active', 'k']] },
-  payments: { title: 'Payment methods', cols: ['name', 'account', 'proof', 'active'], f: [['name', 'Method name (e.g. JazzCash)'], ['account', 'Account number / IBAN'], ['instructions', 'Instructions shown at checkout', 'a'], ['proof', 'Customer must send transaction ID + screenshot', 'k'], ['active', 'Active', 'k']] }
+  products: {
+    title: 'Products',
+    cols: ['image', 'name', 'category', 'price', 'compare_price', 'active'],
+    f: [
+      ['name', 'Name'],
+      ['category', 'Category', 'c'],
+      ['price', 'Sale price (Rs)', 'n'],
+      ['compare_price', 'Original price (Rs, 0 for none)', 'n'],
+      ['label', 'Label (e.g. Best Seller)'],
+      ['image', 'Main image', 'i'],
+      ['description', 'Description', 'a'],
+      ['variants', 'Variants (size / colour, stock)', 'v'],
+      ['active', 'Visible in store', 'k']
+    ]
+  },
+  categories: {
+    title: 'Categories',
+    cols: ['image', 'name', 'sort'],
+    f: [
+      ['name', 'Name'],
+      ['image', 'Image', 'i'],
+      ['sort', 'Sort order', 'n']
+    ]
+  },
+  banners: {
+    title: 'Banners',
+    cols: ['image', 'title', 'subtitle', 'sort', 'active'],
+    f: [
+      ['title', 'Headline'],
+      ['subtitle', 'Subtext'],
+      ['button_text', 'Button text'],
+      ['link', 'Button link (e.g. Sale, Basketball)'],
+      ['image', 'Banner image', 'i'],
+      ['sort', 'Sort order', 'n'],
+      ['active', 'Visible in store', 'k']
+    ]
+  },
+  delivery: {
+    title: 'Delivery charges',
+    cols: ['city', 'charge', 'free_above', 'active'],
+    f: [
+      ['city', 'City (use * for all other cities)'],
+      ['charge', 'Delivery charge (Rs)', 'n'],
+      ['free_above', 'Free delivery above (Rs, 0 = never)', 'n'],
+      ['active', 'Active', 'k']
+    ]
+  },
+  payments: {
+    title: 'Payment methods',
+    cols: ['name', 'account', 'proof', 'active'],
+    f: [
+      ['name', 'Method name (e.g. JazzCash)'],
+      ['account', 'Account number / IBAN'],
+      ['instructions', 'Instructions shown at checkout', 'a'],
+      ['proof', 'Customer must send transaction ID + screenshot', 'k'],
+      ['active', 'Active', 'k']
+    ]
+  }
 };
-const NAV = [['dash', 'Dashboard'], ['orders', 'Orders'], ...Object.entries(CFG).map(([k, v]) => [k, v.title])];
+
+const NAV = [
+  ['dash', 'Dashboard', 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'],
+  ['orders', 'Orders', 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z'],
+  ...Object.entries(CFG).map(([k, v]) => {
+    const icons = {
+      products: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+      categories: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z',
+      banners: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
+      delivery: 'M8 17a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4zM3 5h2l1.5 6H16l2-5H6',
+      payments: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'
+    };
+    return [k, v.title, icons[k] || 'M4 6h16M4 12h16M4 18h16'];
+  })
+];
+
+function toggleSidebar() {
+  $('#sidebar').classList.toggle('open');
+  $('#overlay').classList.toggle('on');
+}
+function closeSidebar() {
+  $('#sidebar').classList.remove('open');
+  $('#overlay').classList.remove('on');
+}
 
 function boot() {
-  $('#login').style.display = 'none'; $('#app').style.display = 'grid';
-  $('#nav').innerHTML = NAV.map(([k, n]) => `<button data-k="${k}" onclick="go('${k}')">${n}</button>`).join(''); go('dash');
+  $('#login').style.display = 'none';
+  $('#app').style.display = 'block';
+  $('#nav').innerHTML = NAV.map(([k, n, path]) =>
+    `<button data-k="${k}" onclick="go('${k}')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>
+      ${n}
+    </button>`
+  ).join('');
+  go('dash');
 }
-function go(k) { tab = k; document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.k === k)); k === 'dash' ? dash() : k === 'orders' ? orders() : list(k); }
+
+function go(k) {
+  tab = k;
+  closeSidebar();
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+  const titles = { dash: 'Dashboard', orders: 'Orders', ...Object.fromEntries(Object.entries(CFG).map(([key, v]) => [key, v.title])) };
+  $('#page-title').textContent = titles[k] || k;
+  $('#page-actions').innerHTML = '';
+  if (k === 'dash') dash();
+  else if (k === 'orders') orders();
+  else list(k);
+}
 
 /* ---------- dashboard ---------- */
 async function dash() {
-  $('#v').innerHTML = '<div class="hd"><h2>Dashboard</h2></div>Loading…';
-  const a = await call('/api/admin/analytics'), days = Object.entries(a.days), mx = Math.max(1, ...days.map(d => d[1].revenue));
-  $('#v').innerHTML = `<div class="hd"><h2>Dashboard</h2></div>
-  <div class="st"><div class="sc"><b>${fmt(a.revenue)}</b><span>Revenue (excl. cancelled)</span></div><div class="sc"><b>${a.orders}</b><span>Total orders</span></div><div class="sc"><b>${fmt(a.aov)}</b><span>Average order value</span></div><div class="sc"><b>${a.byStatus.pending || 0}</b><span>Pending orders</span></div></div>
-  <div class="two"><div class="box"><h3>Revenue, last 14 days</h3><div class="bars">${days.map(([d, v]) => `<div title="${d}: ${fmt(v.revenue)} (${v.orders} orders)" style="height:${v.revenue / mx * 100}%"></div>`).join('')}</div><div class="bl">${days.map(([d]) => `<span>${d.slice(8)}</span>`).join('')}</div></div>
-  <div class="box"><h3>Orders by status</h3>${Object.entries(a.byStatus).map(([s, n]) => `<div class="row"><span>${s}</span><b>${n}</b></div>`).join('') || 'No orders yet.'}</div>
-  <div class="box"><h3>Top products</h3>${a.top.map(t => `<div class="row"><span>${esc(t.name)} × ${t.qty}</span><b>${fmt(t.revenue)}</b></div>`).join('') || 'No sales yet.'}</div>
-  <div class="box"><h3>Top cities</h3>${a.cities.map(c => `<div class="row"><span>${esc(c[0])}</span><b>${c[1]}</b></div>`).join('') || 'No orders yet.'}<h3 style="margin-top:1rem">Low stock</h3>${a.lowStock.map(l => `<div class="row"><span>${esc(l.name)} (${esc(l.v)})</span><b style="color:var(--rd)">${l.stock}</b></div>`).join('') || 'All variants are stocked.'}</div></div>`;
+  $('#v').innerHTML = '<div class="loading"><div class="spinner"></div> Loading analytics…</div>';
+  const a = await call('/api/admin/analytics');
+  const days = Object.entries(a.days);
+  const mx = Math.max(1, ...days.map(d => d[1].revenue));
+
+  const statusHtml = Object.entries(a.byStatus).length
+    ? Object.entries(a.byStatus).map(([s, n]) =>
+        `<div class="row"><span class="pill ${esc(s)}">${esc(s)}</span><b>${n}</b></div>`
+      ).join('')
+    : '<div class="empty-state">No orders yet.</div>';
+
+  const topHtml = a.top.length
+    ? a.top.map(t =>
+        `<div class="row"><span>${esc(t.name)} × ${t.qty}</span><b>${fmt(t.revenue)}</b></div>`
+      ).join('')
+    : '<div class="empty-state">No sales yet.</div>';
+
+  const citiesHtml = a.cities.length
+    ? a.cities.map(c =>
+        `<div class="row"><span>${esc(c[0])}</span><b>${c[1]}</b></div>`
+      ).join('')
+    : '<div class="empty-state">No orders yet.</div>';
+
+  const lowHtml = a.lowStock.length
+    ? a.lowStock.map(l =>
+        `<div class="row"><span>${esc(l.name)} (${esc(l.v)})</span><b style="color:var(--rd)">${l.stock}</b></div>`
+      ).join('')
+    : '<div class="empty-state" style="color:var(--gn)">All variants are stocked.</div>';
+
+  $('#v').innerHTML = `
+    <div class="st">
+      <div class="sc">
+        <div class="label">Revenue (excl. cancelled)</div>
+        <b>${fmt(a.revenue)}</b>
+      </div>
+      <div class="sc">
+        <div class="label">Total orders</div>
+        <b>${a.orders}</b>
+      </div>
+      <div class="sc">
+        <div class="label">Average order value</div>
+        <b>${fmt(a.aov)}</b>
+      </div>
+      <div class="sc">
+        <div class="label">Pending orders</div>
+        <b>${a.byStatus.pending || 0}</b>
+      </div>
+    </div>
+
+    <div class="two">
+      <div class="box">
+        <h3>Revenue, last 14 days <span class="muted">Daily</span></h3>
+        <div class="bars">${days.map(([d, v]) =>
+          `<div title="${d}: ${fmt(v.revenue)} (${v.orders} orders)" style="height:${Math.max(3, v.revenue / mx * 100)}%"></div>`
+        ).join('')}</div>
+        <div class="bl">${days.map(([d]) => `<span>${d.slice(8)}</span>`).join('')}</div>
+      </div>
+      <div class="box">
+        <h3>Orders by status</h3>
+        ${statusHtml}
+      </div>
+    </div>
+
+    <div class="two-bottom">
+      <div class="box">
+        <h3>Top products</h3>
+        ${topHtml}
+      </div>
+      <div class="box">
+        <h3>Top cities</h3>
+        ${citiesHtml}
+        <h3 style="margin-top:1.4rem">Low stock</h3>
+        ${lowHtml}
+      </div>
+    </div>
+  `;
 }
 
 /* ---------- generic list + form ---------- */
 async function list(t) {
-  const c = CFG[t], rows = await call('/api/admin/' + t); if (t === 'products' || t === 'categories') cats = t === 'categories' ? rows : await call('/api/admin/categories');
+  const c = CFG[t];
+  $('#v').innerHTML = '<div class="loading"><div class="spinner"></div> Loading…</div>';
+  const rows = await call('/api/admin/' + t);
+  if (t === 'products' || t === 'categories') {
+    cats = t === 'categories' ? rows : await call('/api/admin/categories');
+  }
   window._rows = rows;
-  $('#v').innerHTML = `<div class="hd"><h2>${c.title}</h2><button class="btn" onclick="form('${t}')">Add new</button></div><div class="tw"><table><tr>${c.cols.map(k => `<th>${k.replace('_', ' ')}</th>`).join('')}<th></th></tr>${rows.map((r, i) => `<tr>${c.cols.map(k => `<td>${k === 'image' ? (r[k] ? `<img src="${esc(r[k])}" alt="">` : '') : ['active', 'proof'].includes(k) ? (r[k] ? 'Yes' : 'No') : ['price', 'compare_price', 'charge', 'free_above'].includes(k) ? fmt(r[k]) : esc(r[k])}</td>`).join('')}<td><button class="btn o s" onclick="form('${t}',${i})">Edit</button> <button class="btn r s" onclick="del('${t}',${r.id})">Delete</button></td></tr>`).join('') || `<tr><td colspan="9">Nothing here yet. Select Add new to create the first one.</td></tr>`}</table></div>`;
+
+  $('#page-actions').innerHTML = `<button class="btn" onclick="form('${t}')">+ Add new</button>`;
+
+  const colLabels = {
+    image: '',
+    name: 'Name',
+    category: 'Category',
+    price: 'Price',
+    compare_price: 'Compare',
+    active: 'Active',
+    sort: 'Sort',
+    title: 'Title',
+    subtitle: 'Subtitle',
+    city: 'City',
+    charge: 'Charge',
+    free_above: 'Free above',
+    account: 'Account',
+    proof: 'Proof'
+  };
+
+  $('#v').innerHTML = `
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            ${c.cols.map(k => `<th>${colLabels[k] || k.replace('_', ' ')}</th>`).join('')}
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map((r, i) => `
+            <tr>
+              ${c.cols.map(k => {
+                if (k === 'image') return `<td>${r[k] ? `<img src="${esc(r[k])}" alt="">` : '—'}</td>`;
+                if (['active', 'proof'].includes(k)) return `<td>${r[k] ? '<span style="color:var(--gn);font-weight:600">Yes</span>' : '<span style="color:var(--mu)">No</span>'}</td>`;
+                if (['price', 'compare_price', 'charge', 'free_above'].includes(k)) return `<td>${fmt(r[k])}</td>`;
+                return `<td>${esc(r[k]) || '—'}</td>`;
+              }).join('')}
+              <td>
+                <div class="actions">
+                  <button class="btn o s" onclick="form('${t}',${i})">Edit</button>
+                  <button class="btn r s" onclick="del('${t}',${r.id})">Delete</button>
+                </div>
+              </td>
+            </tr>
+          `).join('') || `<tr><td colspan="${c.cols.length + 1}" style="text-align:center;padding:2.5rem;color:var(--mu)">Nothing here yet. Click <b>+ Add new</b> to create the first one.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
-async function del(t, id) { if (confirm('Delete this item?')) { await call(`/api/admin/${t}/${id}`, 'DELETE'); list(t); } }
+
+async function del(t, id) {
+  if (confirm('Delete this item? This cannot be undone.')) {
+    await call(`/api/admin/${t}/${id}`, 'DELETE');
+    list(t);
+  }
+}
+
 function form(t, i) {
-  const c = CFG[t], r = i === undefined ? { active: 1 } : window._rows[i];
-  $('#mb').innerHTML = `<h3>${i === undefined ? 'Add' : 'Edit'} ${c.title.toLowerCase().replace(/s$/, '')}</h3>` + c.f.map(([k, l, ty]) => {
-    const v = r[k] ?? '', id = 'f_' + k;
-    if (ty === 'a') return `<label for="${id}">${l}</label><textarea id="${id}" rows="3">${esc(v)}</textarea>`;
-    if (ty === 'k') return `<label><input type="checkbox" id="${id}" style="width:auto" ${v ? 'checked' : ''}> ${l}</label>`;
-    if (ty === 'c') return `<label for="${id}">${l}</label><select id="${id}"><option value="">None</option>${cats.map(x => `<option ${x.name === v ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`;
-    if (ty === 'i') return `<label for="${id}">${l}</label><input type="file" accept="image/*" onchange="img(this,'${id}')"><input type="hidden" id="${id}" value="${esc(v)}"><img class="pv" id="${id}_p" src="${esc(v)}" alt="" ${v ? '' : 'hidden'}>`;
-    if (ty === 'v') return `<label>${l}</label><div id="vs">${(v || []).map(vr).join('')}</div><button class="btn o s" type="button" onclick="$('#vs').insertAdjacentHTML('beforeend',vr({}))">Add variant</button>`;
-    return `<label for="${id}">${l}</label><input id="${id}" type="${ty === 'n' ? 'number' : 'text'}" value="${esc(v)}">`;
-  }).join('') + `<div class="ft"><button class="btn o" onclick="$('#md').classList.remove('on')">Cancel</button><button class="btn" onclick="save('${t}',${r.id || 0})">Save</button></div>`;
+  const c = CFG[t];
+  const r = i === undefined ? { active: 1 } : window._rows[i];
+  $('#mb').innerHTML = `
+    <h3>${i === undefined ? 'Add' : 'Edit'} ${c.title.toLowerCase().replace(/s$/, '')}</h3>
+    ${c.f.map(([k, l, ty]) => {
+      const v = r[k] ?? '';
+      const id = 'f_' + k;
+      if (ty === 'a') return `<label for="${id}">${l}</label><textarea id="${id}" rows="3">${esc(v)}</textarea>`;
+      if (ty === 'k') return `<label style="display:flex;align-items:center;gap:8px;margin-top:16px;cursor:pointer"><input type="checkbox" id="${id}" ${v ? 'checked' : ''}> ${l}</label>`;
+      if (ty === 'c') return `<label for="${id}">${l}</label><select id="${id}"><option value="">None</option>${cats.map(x => `<option ${x.name === v ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`;
+      if (ty === 'i') return `<label for="${id}">${l}</label><input type="file" accept="image/*" onchange="img(this,'${id}')"><input type="hidden" id="${id}" value="${esc(v)}"><img class="pv" id="${id}_p" src="${esc(v)}" alt="" ${v ? '' : 'hidden'}>`;
+      if (ty === 'v') return `<label>${l}</label><div id="vs">${(v || []).map(vr).join('')}</div><button class="btn o s" type="button" style="margin-top:6px" onclick="$('#vs').insertAdjacentHTML('beforeend',vr({}))">+ Add variant</button>`;
+      return `<label for="${id}">${l}</label><input id="${id}" type="${ty === 'n' ? 'number' : 'text'}" value="${esc(v)}">`;
+    }).join('')}
+    <div class="ft">
+      <button class="btn o" onclick="$('#md').classList.remove('on')">Cancel</button>
+      <button class="btn" onclick="save('${t}',${r.id || 0})">Save</button>
+    </div>
+  `;
   $('#md').classList.add('on');
 }
-const vr = v => `<div class="vr"><input placeholder="Name e.g. 42 / Black" value="${esc(v.name)}"><input placeholder="SKU" value="${esc(v.sku)}"><input type="number" placeholder="Price (opt.)" value="${v.price || ''}"><input type="number" placeholder="Stock" value="${v.stock ?? ''}"><button class="btn r s" type="button" onclick="this.parentNode.remove()">×</button></div>`;
+
+const vr = v => `
+  <div class="vr">
+    <input placeholder="Name e.g. 42 / Black" value="${esc(v.name)}">
+    <input placeholder="SKU" value="${esc(v.sku)}">
+    <input type="number" placeholder="Price (opt.)" value="${v.price || ''}">
+    <input type="number" placeholder="Stock" value="${v.stock ?? ''}">
+    <button class="btn r s" type="button" onclick="this.parentNode.remove()">×</button>
+  </div>
+`;
+
 async function img(inp, id) {
-  const f = inp.files[0]; if (!f) return;
+  const f = inp.files[0];
+  if (!f) return;
   const d = await call('/api/admin/upload', 'POST', null, Object.assign(f, {}) && new Blob([f], { type: f.type }));
-  $('#' + id).value = d.url; const p = $('#' + id + '_p'); p.src = d.url; p.hidden = false;
+  $('#' + id).value = d.url;
+  const p = $('#' + id + '_p');
+  p.src = d.url;
+  p.hidden = false;
 }
+
 async function save(t, id) {
   const b = {};
-  CFG[t].f.forEach(([k, , ty]) => { const e = $('#f_' + k) || $('#vs'); b[k] = ty === 'k' ? +$('#f_' + k).checked : ty === 'v' ? [...document.querySelectorAll('#vs .vr')].map(r => { const x = r.querySelectorAll('input'); return { name: x[0].value.trim(), sku: x[1].value.trim(), price: +x[2].value || 0, stock: +x[3].value || 0 }; }).filter(v => v.name) : ty === 'n' ? +e.value || 0 : e.value; });
+  CFG[t].f.forEach(([k, , ty]) => {
+    const e = $('#f_' + k) || $('#vs');
+    b[k] = ty === 'k'
+      ? +$('#f_' + k).checked
+      : ty === 'v'
+        ? [...document.querySelectorAll('#vs .vr')].map(r => {
+            const x = r.querySelectorAll('input');
+            return { name: x[0].value.trim(), sku: x[1].value.trim(), price: +x[2].value || 0, stock: +x[3].value || 0 };
+          }).filter(v => v.name)
+        : ty === 'n'
+          ? +e.value || 0
+          : e.value;
+  });
   if (!(b.name || b.title || b.city)) return alert('Please fill in the name.');
-  await call(`/api/admin/${t}${id ? '/' + id : ''}`, id ? 'PUT' : 'POST', b); $('#md').classList.remove('on'); list(t);
+  await call(`/api/admin/${t}${id ? '/' + id : ''}`, id ? 'PUT' : 'POST', b);
+  $('#md').classList.remove('on');
+  list(t);
 }
 
 /* ---------- orders ---------- */
 const STAT = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'returned'];
+
 async function orders() {
-  $('#v').innerHTML = `<div class="hd"><h2>Orders</h2><button class="btn o" onclick="csv()">Export CSV</button></div>
-  <div class="bulk"><input id="oq" placeholder="Search order no, name, phone" oninput="clearTimeout(window._t);window._t=setTimeout(loadO,300)"><select id="os" onchange="loadO()"><option value="">All statuses</option>${STAT.map(s => `<option>${s}</option>`).join('')}</select>
-  <span style="margin-left:auto">With selected:</span><select id="bs">${STAT.map(s => `<option>${s}</option>`).join('')}</select><button class="btn s" onclick="bulk('status')">Set status</button><button class="btn s" onclick="bulk('courier')">Book courier</button></div>
-  <div class="tw"><table id="ot"></table></div>`; loadO();
+  $('#page-actions').innerHTML = `<button class="btn o" onclick="csv()">Export CSV</button>`;
+  $('#v').innerHTML = `
+    <div class="bulk">
+      <input id="oq" placeholder="Search order no, name, phone…" oninput="clearTimeout(window._t);window._t=setTimeout(loadO,300)" style="flex:1;min-width:160px">
+      <select id="os" onchange="loadO()">
+        <option value="">All statuses</option>
+        ${STAT.map(s => `<option>${s}</option>`).join('')}
+      </select>
+      <span class="spacer"></span>
+      <span style="font-size:0.85rem;color:var(--mu);white-space:nowrap">With selected:</span>
+      <select id="bs">${STAT.map(s => `<option>${s}</option>`).join('')}</select>
+      <button class="btn s" onclick="bulk('status')">Set status</button>
+      <button class="btn s" onclick="bulk('courier')">Book courier</button>
+    </div>
+    <div class="tw"><table id="ot"></table></div>
+  `;
+  loadO();
 }
+
 async function loadO() {
   const rows = window._o = await call(`/api/admin/orders?status=${$('#os').value}&q=${encodeURIComponent($('#oq').value)}`);
-  $('#ot').innerHTML = `<tr><th><input type="checkbox" style="width:auto" onchange="document.querySelectorAll('.oc').forEach(c=>c.checked=this.checked)" aria-label="Select all"></th><th>Order</th><th>Customer</th><th>City</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th></th></tr>` +
-    (rows.map((o, i) => `<tr><td><input class="oc" type="checkbox" style="width:auto" value="${o.id}"></td><td><b>${o.order_no}</b></td><td>${esc(o.name)}<br><small>${esc(o.phone)}</small></td><td>${esc(o.city)}</td><td>${fmt(o.total)}</td><td>${esc(o.payment)}</td><td><span class="pill">${o.status}</span>${o.tracking ? `<br><small>${esc(o.courier)} ${esc(o.tracking)}</small>` : ''}</td><td>${o.created_at.slice(0, 10)}</td><td><button class="btn o s" onclick="ov(${i})">View</button></td></tr>`).join('') || '<tr><td colspan="9">No orders found.</td></tr>');
+  $('#ot').innerHTML = `
+    <thead>
+      <tr>
+        <th><input type="checkbox" style="width:auto" onchange="document.querySelectorAll('.oc').forEach(c=>c.checked=this.checked)" aria-label="Select all"></th>
+        <th>Order</th>
+        <th>Customer</th>
+        <th>City</th>
+        <th>Total</th>
+        <th>Payment</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map((o, i) => `
+        <tr>
+          <td><input class="oc" type="checkbox" style="width:auto" value="${o.id}"></td>
+          <td><b>${esc(o.order_no)}</b></td>
+          <td>${esc(o.name)}<br><small style="color:var(--mu)">${esc(o.phone)}</small></td>
+          <td>${esc(o.city)}</td>
+          <td>${fmt(o.total)}</td>
+          <td>${esc(o.payment)}</td>
+          <td>
+            <span class="pill ${esc(o.status)}">${esc(o.status)}</span>
+            ${o.tracking ? `<br><small style="color:var(--mu)">${esc(o.courier)} ${esc(o.tracking)}</small>` : ''}
+          </td>
+          <td>${o.created_at.slice(0, 10)}</td>
+          <td><button class="btn o s" onclick="ov(${i})">View</button></td>
+        </tr>
+      `).join('') || '<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--mu)">No orders found.</td></tr>'}
+    </tbody>
+  `;
 }
+
 async function bulk(action) {
-  const ids = [...document.querySelectorAll('.oc:checked')].map(c => +c.value); if (!ids.length) return alert('Select at least one order.');
+  const ids = [...document.querySelectorAll('.oc:checked')].map(c => +c.value);
+  if (!ids.length) return alert('Select at least one order.');
   if (!confirm(`${action === 'courier' ? 'Book courier for' : 'Update'} ${ids.length} order(s)?`)) return;
-  const r = await call('/api/admin/orders/bulk', 'POST', { ids, action, status: $('#bs').value }), bad = r.filter(x => x.error);
-  if (bad.length) alert(`${r.length - bad.length} done, ${bad.length} failed:\n` + bad.map(x => '#' + x.id + ': ' + x.error).join('\n')); loadO();
+  const r = await call('/api/admin/orders/bulk', 'POST', { ids, action, status: $('#bs').value });
+  const bad = r.filter(x => x.error);
+  if (bad.length) alert(`${r.length - bad.length} done, ${bad.length} failed:\n` + bad.map(x => '#' + x.id + ': ' + x.error).join('\n'));
+  loadO();
 }
+
 function ov(i) {
-  const o = window._o[i], it = JSON.parse(o.items || '[]');
-  $('#mb').innerHTML = `<h3>${o.order_no}</h3><p>${esc(o.name)} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>${o.email ? ' · ' + esc(o.email) : ''}</p><p>${esc(o.address)}, ${esc(o.city)}</p>
-  <div style="margin:12px 0">${it.map(x => `<div class="row"><span>${esc(x.name)} ${esc(x.v)} × ${x.qty}</span><span>${fmt(x.price * x.qty)}</span></div>`).join('')}<div class="row"><span>Delivery</span><span>${fmt(o.shipping)}</span></div><div class="row"><b>Total (${esc(o.payment)})</b><b>${fmt(o.total)}</b></div></div>
-  ${o.tid ? `<p>Transaction ID: <b>${esc(o.tid)}</b></p>` : ''}${o.proof ? `<a href="${esc(o.proof)}" target="_blank" rel="noopener"><img class="pv" style="width:140px;height:140px" src="${esc(o.proof)}" alt="Payment proof"></a>` : ''}
-  <label>Status</label><select id="o_s">${STAT.map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}</select><label>Courier</label><input id="o_c" value="${esc(o.courier)}"><label>Tracking number</label><input id="o_t" value="${esc(o.tracking)}">
-  <div class="ft"><button class="btn o" onclick="window.print()">Print</button><button class="btn o" onclick="$('#md').classList.remove('on')">Close</button><button class="btn" onclick="so(${o.id})">Save</button></div>`;
+  const o = window._o[i];
+  const it = JSON.parse(o.items || '[]');
+  $('#mb').innerHTML = `
+    <h3>${esc(o.order_no)}</h3>
+    <p style="margin-top:6px">${esc(o.name)} · <a href="tel:${esc(o.phone)}" style="color:var(--li)">${esc(o.phone)}</a>${o.email ? ' · ' + esc(o.email) : ''}</p>
+    <p style="color:var(--mu);font-size:0.9rem;margin-top:2px">${esc(o.address)}, ${esc(o.city)}</p>
+    <div style="margin:16px 0">
+      ${it.map(x => `<div class="row"><span>${esc(x.name)} ${esc(x.v)} × ${x.qty}</span><span>${fmt(x.price * x.qty)}</span></div>`).join('')}
+      <div class="row"><span>Delivery</span><span>${fmt(o.shipping)}</span></div>
+      <div class="row"><b>Total (${esc(o.payment)})</b><b>${fmt(o.total)}</b></div>
+    </div>
+    ${o.tid ? `<p style="margin-bottom:8px">Transaction ID: <b>${esc(o.tid)}</b></p>` : ''}
+    ${o.proof ? `<a href="${esc(o.proof)}" target="_blank" rel="noopener"><img class="pv" style="width:140px;height:140px" src="${esc(o.proof)}" alt="Payment proof"></a>` : ''}
+    <label for="o_s">Status</label>
+    <select id="o_s">${STAT.map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}</select>
+    <label for="o_c">Courier</label>
+    <input id="o_c" value="${esc(o.courier)}">
+    <label for="o_t">Tracking number</label>
+    <input id="o_t" value="${esc(o.tracking)}">
+    <div class="ft">
+      <button class="btn o" onclick="window.print()">Print</button>
+      <button class="btn o" onclick="$('#md').classList.remove('on')">Close</button>
+      <button class="btn" onclick="so(${o.id})">Save</button>
+    </div>
+  `;
   $('#md').classList.add('on');
 }
-async function so(id) { await call('/api/admin/orders/' + id, 'PUT', { status: $('#o_s').value, courier: $('#o_c').value, tracking: $('#o_t').value }); $('#md').classList.remove('on'); loadO(); }
-function csv() {
-  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"', h = ['order_no', 'name', 'phone', 'city', 'address', 'total', 'payment', 'status', 'created_at'];
-  const b = new Blob([[h.join(','), ...window._o.map(o => h.map(k => q(o[k])).join(','))].join('\n')], { type: 'text/csv' }), a = document.createElement('a');
-  a.href = URL.createObjectURL(b); a.download = 'orders.csv'; a.click();
+
+async function so(id) {
+  await call('/api/admin/orders/' + id, 'PUT', {
+    status: $('#o_s').value,
+    courier: $('#o_c').value,
+    tracking: $('#o_t').value
+  });
+  $('#md').classList.remove('on');
+  loadO();
 }
-$('#md').addEventListener('click', e => { if (e.target.id === 'md') e.target.classList.remove('on'); });
+
+function csv() {
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const h = ['order_no', 'name', 'phone', 'city', 'address', 'total', 'payment', 'status', 'created_at'];
+  const b = new Blob([[h.join(','), ...window._o.map(o => h.map(k => q(o[k])).join(','))].join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'orders.csv';
+  a.click();
+}
+
+$('#md').addEventListener('click', e => {
+  if (e.target.id === 'md') e.target.classList.remove('on');
+});
+
 if (tok) boot();
 </script>
 </body>
