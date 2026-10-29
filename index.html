@@ -66,7 +66,14 @@ select,input,textarea{font:inherit;width:100%;padding:13px 16px;background:var(-
 .mp iframe{width:100%;height:260px;border:0;border-radius:16px}
 /* shop + product */
 .chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:2rem;align-items:center}.chip{padding:9px 20px;border-radius:99px;background:var(--cd);border:1.5px solid var(--ln);font-weight:500;transition:.3s}.chip:hover,.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}.chips select{width:auto;margin-left:auto}
-.pd{display:grid;grid-template-columns:1.05fr 1fr;gap:3.5rem;align-items:start}.pd .ph{border-radius:20px;aspect-ratio:1;cursor:zoom-in;overflow:hidden}.pd .ph img{width:100%;height:100%;object-fit:cover;transition:transform .3s}.pd .ph:hover img{transform:scale(1.7)}
+.pd{display:grid;grid-template-columns:1.05fr 1fr;gap:3.5rem;align-items:start}
+.pd-gallery{display:flex;flex-direction:column;gap:12px}
+.pd .ph{border-radius:20px;aspect-ratio:1;cursor:zoom-in;overflow:hidden;background:#dfe3ea}
+.pd .ph img{width:100%;height:100%;object-fit:cover;transition:transform .3s}.pd .ph:hover img{transform:scale(1.7)}
+.thumbs{display:flex;gap:10px;flex-wrap:wrap}
+.thumbs button{width:72px;height:72px;border-radius:12px;border:2px solid var(--ln);padding:0;overflow:hidden;background:var(--cd);cursor:pointer;transition:.2s}
+.thumbs button.on,.thumbs button:hover{border-color:var(--ink)}
+.thumbs button img{width:100%;height:100%;object-fit:cover}
 .pd h1{font-size:clamp(2rem,4vw,3rem);margin:.5rem 0 .8rem}.pd .pr{font-size:1.6rem;margin-bottom:.5rem}.pd .pr em{background:var(--rd);color:#fff;font-style:normal;font-size:.8rem;padding:3px 10px;border-radius:8px}
 .sz{display:flex;gap:10px;flex-wrap:wrap;margin:.7rem 0 1.4rem}.sz button{padding:11px 16px;border-radius:10px;border:1.5px solid var(--ln);background:var(--cd);font-weight:500}.sz button.on,.sz button:hover{background:var(--ink);color:#fff;border-color:var(--ink)}.sz button:disabled{opacity:.35;cursor:not-allowed}
 .q{display:inline-flex;align-items:center;gap:14px;border:1.5px solid var(--ln);border-radius:10px;background:var(--cd);padding:4px;margin:.5rem 0 .5rem}.q button{width:38px;height:38px;border-radius:8px;border:0;background:none;font-weight:700;font-size:1.1rem}.q button:hover{background:var(--bg)}
@@ -117,7 +124,7 @@ footer h4{font-family:var(--hf);color:var(--li);margin-bottom:1rem}footer li,foo
 <div class="rv" style="--d:.1s"><div class="ci2"><h3>Call us</h3><a href="tel:03342907793">0334 2907793</a><a href="tel:+923342907793">+92 334 2907793</a></div><div class="ci2"><h3>Visit our store</h3><p>Block H North Nazimabad Town, Karachi, Pakistan</p><a href="https://maps.app.goo.gl/n75612AaM1Jfk76P7" target="_blank" rel="noopener" style="font-weight:700;color:var(--ink);margin-top:.4rem">Get directions</a></div><div class="mp"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14445.84111231651!2d67.0333333!3d24.9333333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3eb33f0000000001%3A0x0!2sBlock%20H%20North%20Nazimabad%20Town%2C%20Karachi%2C%20Pakistan!5e0!3m2!1sen!2s!4v1610000000000!5m2!1sen!2s" allowfullscreen loading="lazy" title="Store location"></iframe></div></div></div></section>
 </div>
 <div class="page" id="p-shop"><div class="wrap"><div class="st"><h2 id="sh">Shop all</h2></div><div class="chips" id="chips"></div><div class="grid" id="sp"></div></div></div>
-<div class="page" id="p-product"><div class="wrap"><button class="back" onclick="shop(cat)">← Back to shop</button><div class="pd"><div class="ph" id="dim" onmousemove="zm(event)"></div><div><small id="dc" style="color:var(--mu);font-weight:500"></small><h1 id="dn"></h1><div class="pr" id="dp"></div><p id="ddesc" style="color:var(--mu);margin:.8rem 0 1.4rem"></p><div id="variant-label"><b>Variant</b></div><div class="sz" id="sz"></div><b>Quantity</b><br><div class="q"><button onclick="pq(-1)" aria-label="Less">−</button><span id="pqv">1</span><button onclick="pq(1)" aria-label="More">+</button></div><div class="stk" id="stk"></div>
+<div class="page" id="p-product"><div class="wrap"><button class="back" onclick="shop(cat)">← Back to shop</button><div class="pd"><div class="pd-gallery"><div class="ph" id="dim" onmousemove="zm(event)"></div><div class="thumbs" id="thumbs"></div></div><div><small id="dc" style="color:var(--mu);font-weight:500"></small><h1 id="dn"></h1><div class="pr" id="dp"></div><p id="ddesc" style="color:var(--mu);margin:.8rem 0 1.4rem"></p><div id="variant-label"><b>Variant</b></div><div class="sz" id="sz"></div><b>Quantity</b><br><div class="q"><button onclick="pq(-1)" aria-label="Less">−</button><span id="pqv">1</span><button onclick="pq(1)" aria-label="More">+</button></div><div class="stk" id="stk"></div>
 <div class="btns"><button class="btn o" id="btn-add" onclick="add(0)">Add to cart</button><button class="btn" id="btn-buy" onclick="add(1)">Buy now</button></div>
 <div class="tb"><div><b>Free delivery</b><small>On orders above Rs 15,000</small></div><div><b>24/7 support</b><small>We’re here to help</small></div><div><b>100% satisfaction</b><small>Guaranteed on every pair</small></div><div><b>7-day returns</b><small>Easy and hassle free</small></div></div></div></div>
 <div class="st" style="margin-top:4rem"><h2>You may also like</h2></div><div class="grid" id="rel"></div></div></div>
@@ -237,6 +244,46 @@ function shop(c) {
 }
 
 // ========== Product detail ==========
+function productImages(p, variantName) {
+  const imgs = [];
+  const seen = new Set();
+  const add = url => {
+    if (!url || seen.has(url)) return;
+    seen.add(url);
+    imgs.push(url);
+  };
+  // Variant image first when selected
+  if (variantName && p.variants) {
+    const v = p.variants.find(x => x.name === variantName);
+    if (v && v.image) add(v.image);
+  }
+  add(p.image);
+  const gal = Array.isArray(p.gallery) ? p.gallery : (typeof p.gallery === 'string' ? (() => { try { return JSON.parse(p.gallery || '[]'); } catch { return []; } })() : []);
+  gal.forEach(add);
+  // Other variant images in thumbs
+  (p.variants || []).forEach(v => { if (v.image) add(v.image); });
+  if (!imgs.length) imgs.push('https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1100&q=80');
+  return imgs;
+}
+
+function setMainImage(url, thumbIndex) {
+  $('dim').innerHTML = `<img src="${esc(url)}" alt="${esc(cur ? cur.name : '')}" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1100&q=80'">`;
+  document.querySelectorAll('#thumbs button').forEach((b, i) => b.classList.toggle('on', i === thumbIndex));
+}
+
+function renderGallery(variantName) {
+  if (!cur) return;
+  const imgs = productImages(cur, variantName);
+  setMainImage(imgs[0], 0);
+  $('thumbs').innerHTML = imgs.length > 1
+    ? imgs.map((url, i) =>
+        `<button type="button" class="${i === 0 ? 'on' : ''}" onclick="setMainImage('${esc(url)}',${i})">
+          <img src="${esc(url)}" alt="" loading="lazy">
+        </button>`
+      ).join('')
+    : '';
+}
+
 function view(id) {
   cur = products.find(p => p.id === id);
   if (!cur) return;
@@ -244,7 +291,7 @@ function view(id) {
   const variants = cur.variants || [];
   size = variants.length ? (variants.find(v => v.stock > 0) || variants[0]).name : '';
 
-  $('dim').innerHTML = `<img src="${esc(cur.image || '')}" alt="${esc(cur.name)}" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1100&q=80'">`;
+  renderGallery(size);
   $('dn').textContent = cur.name;
   $('dc').textContent = cur.category || '';
   $('ddesc').textContent = cur.description || 'Experience unparalleled comfort and refined style. Crafted with premium materials for all-day support.';
@@ -255,7 +302,7 @@ function view(id) {
     $('variant-label').style.display = 'block';
     $('sz').innerHTML = variants.map(v =>
       `<button class="${v.name === size ? 'on' : ''}" ${v.stock <= 0 ? 'disabled' : ''}
-        onclick="size='${esc(v.name)}';document.querySelectorAll('#sz button').forEach(b=>b.classList.toggle('on',b===this));updateProductPrice()">
+        onclick="size='${esc(v.name)}';document.querySelectorAll('#sz button').forEach(b=>b.classList.toggle('on',b===this));updateProductPrice();renderGallery(size)">
         ${esc(v.name)}${v.stock <= 0 ? ' (sold out)' : ''}
       </button>`
     ).join('');
