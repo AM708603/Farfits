@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FARFITS | Premium Footwear Online Store</title>
+<meta name="description" content="FARFITS — Premium footwear online store in Karachi. Shop running, lifestyle, basketball and casual shoes with cash on delivery.">
+<meta name="theme-color" content="#0b1f3a">
+<meta property="og:site_name" content="FARFITS">
+<meta property="og:type" content="website">
+<meta property="og:title" content="FARFITS | Premium Footwear Online Store">
+<meta property="og:description" content="Premium footwear designed for comfort and style. Free delivery on selected orders. Cash on delivery available.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80">
+<meta property="og:url" content="https://am708603.github.io/Farfits/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FARFITS | Premium Footwear Online Store">
+<meta name="twitter:description" content="Premium footwear designed for comfort and style. Shop online with cash on delivery.">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80">
+<link rel="canonical" href="https://am708603.github.io/Farfits/">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1f3a'/%3E%3Crect x='15' y='14' width='34' height='5' rx='2.5' fill='%23fff'/%3E%3Crect x='29' y='19' width='6' height='26' fill='%23fff'/%3E%3Crect x='19' y='30' width='26' height='3.5' fill='%23c9a14a'/%3E%3Crect x='24' y='45' width='16' height='3' fill='%23fff'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -199,6 +212,7 @@ footer h4{font-family:var(--hf);color:var(--li);margin-bottom:1rem}footer li,foo
 <div class="page" id="p-shop"><div class="wrap"><div class="st"><h2 id="sh">Shop all</h2></div><div class="chips" id="chips"></div><div class="grid" id="sp"></div></div></div>
 <div class="page" id="p-product"><div class="wrap"><button class="back" onclick="shop(cat)">← Back to shop</button><div class="pd"><div class="pd-gallery"><div class="ph" id="dim" onmousemove="zm(event)"></div><div class="thumbs" id="thumbs"></div></div><div><small id="dc" style="color:var(--mu);font-weight:500"></small><h1 id="dn"></h1><div class="pr" id="dp"></div><p id="ddesc" style="color:var(--mu);margin:.8rem 0 1.4rem"></p><div id="variant-label"><b>Variant</b></div><div class="sz" id="sz"></div><b>Quantity</b><br><div class="q"><button onclick="pq(-1)" aria-label="Less">−</button><span id="pqv">1</span><button onclick="pq(1)" aria-label="More">+</button></div><div class="stk" id="stk"></div>
 <div class="btns"><button class="btn o" id="btn-add" onclick="add(0)">Add to cart</button><button class="btn" id="btn-buy" onclick="add(1)">Buy now</button></div>
+<div id="share-row" style="margin-bottom:1.4rem"></div>
 <div class="tb"><div><b>Free delivery</b><small>On orders above Rs 15,000</small></div><div><b>24/7 support</b><small>We’re here to help</small></div><div><b>100% satisfaction</b><small>Guaranteed on every pair</small></div><div><b>7-day returns</b><small>Easy and hassle free</small></div></div></div></div>
 <div class="st" style="margin-top:4rem"><h2>You may also like</h2></div><div class="grid" id="rel"></div></div></div>
 <div class="page" id="p-cart"><div class="wrap"><div class="st"><h2>Your cart</h2></div><div id="cart"></div></div></div>
@@ -295,23 +309,122 @@ function card(p, i) {
   </div>`;
 }
 
+// ========== Routing & SEO meta ==========
+const SITE = (localStorage.site || 'https://am708603.github.io/Farfits').replace(/\/$/, '');
+const PAGE_META = {
+  home: { title: 'FARFITS | Premium Footwear Online Store', desc: 'Premium footwear in Karachi. Shop running, lifestyle, basketball and casual shoes with cash on delivery.' },
+  shop: { title: 'Shop | FARFITS', desc: 'Browse the full FARFITS collection — running, lifestyle, basketball and more.' },
+  product: { title: 'Product | FARFITS', desc: 'Shop premium footwear at FARFITS.' },
+  cart: { title: 'Your cart | FARFITS', desc: 'Review items in your FARFITS cart.' },
+  checkout: { title: 'Checkout | FARFITS', desc: 'Complete your FARFITS order.' },
+  track: { title: 'Track order | FARFITS', desc: 'Track your FARFITS order status with order number and phone.' },
+  about: { title: 'About | FARFITS', desc: 'FARFITS — shoes that make the whole day better. Based in North Nazimabad, Karachi.' },
+  contact: { title: 'Contact | FARFITS', desc: 'Call or visit FARFITS in North Nazimabad, Karachi.' },
+  thanks: { title: 'Order confirmed | FARFITS', desc: 'Thank you for your FARFITS order.' }
+};
+
+function setMeta(opts) {
+  const title = opts.title || PAGE_META.home.title;
+  const desc = opts.desc || PAGE_META.home.desc;
+  const image = opts.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80';
+  const url = opts.url || (SITE + '/');
+  document.title = title;
+  const set = (sel, attr, val) => {
+    let el = document.querySelector(sel);
+    if (!el && sel.startsWith('meta')) {
+      el = document.createElement('meta');
+      const m = sel.match(/property="([^"]+)"/) || sel.match(/name="([^"]+)"/);
+      if (m) {
+        if (sel.includes('property')) el.setAttribute('property', m[1]);
+        else el.setAttribute('name', m[1]);
+        document.head.appendChild(el);
+      }
+    }
+    if (el) el.setAttribute(attr, val);
+  };
+  set('meta[name="description"]', 'content', desc);
+  set('meta[property="og:title"]', 'content', title);
+  set('meta[property="og:description"]', 'content', desc);
+  set('meta[property="og:image"]', 'content', image);
+  set('meta[property="og:url"]', 'content', url);
+  set('meta[property="og:type"]', 'content', opts.type || 'website');
+  set('meta[name="twitter:title"]', 'content', title);
+  set('meta[name="twitter:description"]', 'content', desc);
+  set('meta[name="twitter:image"]', 'content', image);
+  let can = document.querySelector('link[rel="canonical"]');
+  if (can) can.href = url;
+}
+
+function routePath() {
+  const h = (location.hash || '#/').replace(/^#\/?/, '');
+  return h.split('/').filter(Boolean);
+}
+
+function setRoute(path, replace) {
+  const hash = '#/' + String(path || '').replace(/^\//, '');
+  if (replace) history.replaceState(null, '', hash);
+  else if (location.hash !== hash) history.pushState(null, '', hash);
+}
+
+function applyRoute() {
+  const parts = routePath();
+  const page = parts[0] || 'home';
+  if (page === 'product' && parts[1]) {
+    const id = +parts[1];
+    if (products.length) view(id, true);
+    else window._pendingProduct = id;
+    return;
+  }
+  if (page === 'shop') {
+    const c = parts[1] ? decodeURIComponent(parts[1]) : 'all';
+    shop(c, !!shopQuery, true);
+    return;
+  }
+  const known = ['home', 'cart', 'checkout', 'track', 'about', 'contact', 'thanks'];
+  if (known.includes(page)) {
+    nav(page, true);
+    return;
+  }
+  nav('home', true);
+}
+
 // ========== Navigation ==========
-function nav(id) {
+function nav(id, fromRoute) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  $('p-' + id).classList.add('on');
+  const el = $('p-' + id);
+  if (!el) return;
+  el.classList.add('on');
   $('nl').classList.remove('on');
   scrollTo(0, 0);
   if (id === 'cart') rCart();
   if (id === 'checkout') rSum();
+  if (!fromRoute) {
+    const path = id === 'home' ? '' : id;
+    setRoute(path);
+  }
+  const m = PAGE_META[id] || PAGE_META.home;
+  setMeta({ title: m.title, desc: m.desc, url: SITE + (id === 'home' ? '/' : '/#/' + id) });
   setTimeout(obs, 30);
 }
 
 let shopQuery = '';
 
-function shop(c, keepQuery) {
+function shop(c, keepQuery, fromRoute) {
   cat = c;
   if (!keepQuery) shopQuery = '';
-  nav('shop');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  $('p-shop').classList.add('on');
+  $('nl').classList.remove('on');
+  scrollTo(0, 0);
+  if (!fromRoute) {
+    setRoute(c && c !== 'all' ? 'shop/' + encodeURIComponent(c) : 'shop');
+  }
+  const title = c === 'all' ? 'Shop | FARFITS' : name(c) + ' | FARFITS';
+  setMeta({
+    title,
+    desc: c === 'all' ? PAGE_META.shop.desc : `Shop ${name(c)} footwear at FARFITS. Premium shoes with cash on delivery.`,
+    url: SITE + '/#/shop' + (c && c !== 'all' ? '/' + encodeURIComponent(c) : '')
+  });
   $('sh').textContent = c === 'all' ? 'All products' : name(c);
   const catNames = ['all', 'Sale', ...categories.map(x => x.name)];
   $('chips').innerHTML = `
@@ -397,7 +510,7 @@ function renderGallery(variantName) {
     : '';
 }
 
-async function view(id) {
+async function view(id, fromRoute) {
   // Pull latest stock before showing product
   try {
     const r = await fetch(API + '/api/public/store');
@@ -408,15 +521,36 @@ async function view(id) {
   } catch (_) {}
 
   cur = products.find(p => p.id == id);
-  if (!cur) return;
+  if (!cur) {
+    if (!fromRoute) alert('Product not found');
+    nav('shop');
+    return;
+  }
   pqty = 1;
   const variants = cur.variants || [];
   size = variants.length ? (variants.find(v => v.stock > 0) || variants[0]).name : '';
 
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  $('p-product').classList.add('on');
+  $('nl').classList.remove('on');
+  scrollTo(0, 0);
+  if (!fromRoute) setRoute('product/' + cur.id);
+
+  const desc = cur.description || 'Experience unparalleled comfort and refined style at FARFITS.';
+  const img = cur.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80';
+  const shareUrl = productShareUrl(cur.id);
+  setMeta({
+    title: cur.name + ' | FARFITS',
+    desc: desc.slice(0, 160),
+    image: absUrl(img),
+    url: shareUrl,
+    type: 'product'
+  });
+
   renderGallery(size);
   $('dn').textContent = cur.name;
   $('dc').textContent = cur.category || '';
-  $('ddesc').textContent = cur.description || 'Experience unparalleled comfort and refined style. Crafted with premium materials for all-day support.';
+  $('ddesc').textContent = desc;
   updateProductPrice();
   $('pqv').textContent = 1;
 
@@ -434,12 +568,52 @@ async function view(id) {
   }
 
   updateStockUI();
+  if ($('share-row')) {
+    $('share-row').innerHTML = `
+      <button class="btn o" type="button" onclick="shareProduct()" style="width:100%">Share product</button>
+      <small style="display:block;margin-top:8px;color:var(--mu);word-break:break-all">${esc(shareUrl)}</small>`;
+  }
   $('rel').innerHTML = products
     .filter(p => p.category === cur.category && p.id !== cur.id)
     .concat(products.filter(p => p.category !== cur.category))
     .slice(0, 4)
     .map(card).join('');
-  nav('product');
+  setTimeout(obs, 30);
+}
+
+function absUrl(u) {
+  if (!u) return '';
+  if (/^https?:\/\//i.test(u)) return u;
+  if (u.startsWith('/')) return API.replace(/\/$/, '') + u;
+  return u;
+}
+
+function productShareUrl(id) {
+  // Worker share page has real OG tags for WhatsApp / Facebook / etc.
+  return API.replace(/\/$/, '') + '/p/' + id;
+}
+
+function productPageUrl(id) {
+  return SITE + '/#/product/' + id;
+}
+
+async function shareProduct() {
+  if (!cur) return;
+  const url = productShareUrl(cur.id);
+  const title = cur.name + ' | FARFITS';
+  const text = (cur.description || cur.name).slice(0, 120);
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, text, url });
+      return;
+    }
+  } catch (_) {}
+  try {
+    await navigator.clipboard.writeText(url);
+    alert('Product link copied!\n\n' + url);
+  } catch {
+    prompt('Copy this product link:', url);
+  }
 }
 
 function updateProductPrice() {
@@ -988,6 +1162,16 @@ async function loadStore() {
     upd();
     obs();
     onScroll();
+    // Deep link after data loads
+    if (window._pendingProduct) {
+      const id = window._pendingProduct;
+      window._pendingProduct = null;
+      view(id, true);
+    } else if (location.hash && location.hash.length > 2) {
+      applyRoute();
+    } else {
+      setMeta(PAGE_META.home);
+    }
   } catch (e) {
     console.error(e);
     $('car').innerHTML = `
@@ -1091,6 +1275,8 @@ function renderCheckoutOptions() {
 }
 
 // init
+window.addEventListener('hashchange', applyRoute);
+window.addEventListener('popstate', applyRoute);
 loadStore();
 </script>
 </body>
